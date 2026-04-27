@@ -251,6 +251,16 @@ body { background: var(--bg); color: var(--text); font-family: 'Rajdhani', sans-
 .kpi-card.blue .kpi-value { color: var(--blue); }
 .kpi-card.teal .kpi-value { color: var(--teal); }
 .kpi-card.violet .kpi-value { color: var(--violet); }
+.kpi-card.clickable { cursor: pointer; transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s; }
+.kpi-card.clickable:hover { transform: translateY(-2px); border-color: var(--border2); box-shadow: 0 6px 20px rgba(0,0,0,0.4); }
+.kpi-card.clickable:active { transform: translateY(0); }
+.kpi-card.clickable::after {
+  content: "→"; position: absolute; top: 14px; right: 14px;
+  font-size: 14px; color: var(--text3); opacity: 0;
+  transition: opacity 0.15s, transform 0.15s;
+}
+.kpi-card { position: relative; }
+.kpi-card.clickable:hover::after { opacity: 1; transform: translateX(2px); }
 
 /* ── SECTION HEADER ─── */
 .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
@@ -813,22 +823,18 @@ button, .nav-item, .modal-overlay, .order-card, .estoque-card, .carga-card { -we
       </div>
     </div>
     <div class="login-title">Acesso ao Sistema</div>
-    <div class="login-sub">Selecione seu perfil e insira a senha</div>
+    <div class="login-sub">Selecione seu perfil para entrar</div>
     <div class="form-group">
       <label class="form-label">Usuário</label>
       <select class="form-select" id="login-user"></select>
     </div>
-    <div class="form-group">
-      <label class="form-label">Senha</label>
-      <input type="password" class="form-input" id="login-pass" placeholder="••••••••" autocomplete="current-password">
-    </div>
     <button class="btn-primary" onclick="doLogin()">ENTRAR</button>
-    <div class="login-error" id="login-error">Senha incorreta. Tente novamente.</div>
     <div class="login-hint">
-      <b>Acesso rápido:</b><br>
-      👑 Admin → senha <b>1234</b><br>
-      📊 PCP → senha <b>1234</b><br>
-      ⚙ Produção/Qualidade → senha <b>1234</b>
+      <b>Sistema multiusuário</b><br>
+      👑 Administradores · gestão completa<br>
+      📊 PCP · planejamento e cargas<br>
+      ⚙ Produção · operadores por setor<br>
+      ✅ Qualidade · inspeção
     </div>
   </div>
 </div>
@@ -874,6 +880,17 @@ button, .nav-item, .modal-overlay, .order-card, .estoque-card, .carga-card { -we
 </div>
 
 <!-- ══════════ MODALS ══════════ -->
+<div class="modal-overlay" id="modal-kpi-drill">
+  <div class="modal" style="width:880px;max-width:95vw;max-height:90vh;overflow-y:auto">
+    <div class="modal-title" id="kpi-drill-titulo">Detalhes</div>
+    <div class="modal-sub" id="kpi-drill-sub">—</div>
+    <div id="kpi-drill-conteudo"></div>
+    <div class="modal-actions">
+      <button class="btn-sm btn-outline" onclick="closeModal('modal-kpi-drill')">Fechar</button>
+    </div>
+  </div>
+</div>
+
 <div class="modal-overlay" id="modal-avancar">
   <div class="modal">
     <div class="modal-title">Confirmar Avanço de Setor</div>
@@ -1259,16 +1276,13 @@ function getSetorBadgeClass(setor) {
 function initLogin() {
   const sel = document.getElementById('login-user');
   sel.innerHTML = USUARIOS.map(u => `<option value="${u.id}">${u.nome}</option>`).join('');
-  document.getElementById('login-pass').addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
+  sel.addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
 }
 
 function doLogin() {
   const uid = parseInt(document.getElementById('login-user').value);
-  const pass = document.getElementById('login-pass').value;
   const user = USUARIOS.find(u => u.id === uid);
-  const err = document.getElementById('login-error');
-  if (!user || user.senha !== pass) { err.style.display = 'block'; return; }
-  err.style.display = 'none';
+  if (!user) return;
   state.usuario = user;
   document.getElementById('login-screen').style.display = 'none';
   document.getElementById('app').classList.add('active');
@@ -1282,7 +1296,6 @@ function doLogout() {
   state.usuario = null;
   document.getElementById('app').classList.remove('active');
   document.getElementById('login-screen').style.display = 'flex';
-  document.getElementById('login-pass').value = '';
 }
 
 function getPerfillabel(user) {
@@ -1414,14 +1427,14 @@ function renderDashboard(el, topTitle, topSub, topActions) {
 
   el.innerHTML = `
   <div class="kpi-grid">
-    <div class="kpi-card amber"><div class="kpi-label">Em Produção</div><div class="kpi-value">${em_prod}</div><div class="kpi-sub">máquinas ativas</div></div>
-    <div class="kpi-card violet"><div class="kpi-label">Cargas Planejadas</div><div class="kpi-value">${cargas_planej}</div><div class="kpi-sub">aguardando liberação</div></div>
-    <div class="kpi-card green"><div class="kpi-label">Cargas Liberadas</div><div class="kpi-value">${cargas_lib}</div><div class="kpi-sub">em produção</div></div>
-    <div class="kpi-card blue"><div class="kpi-label">Estoque Banho</div><div class="kpi-value">${est_banho}</div><div class="kpi-sub">disponíveis</div></div>
-    <div class="kpi-card teal"><div class="kpi-label">Estoque PA</div><div class="kpi-value">${est_pa}</div><div class="kpi-sub">prod. acabado</div></div>
-    <div class="kpi-card amber"><div class="kpi-label">Em Qualidade</div><div class="kpi-value">${qualidade}</div><div class="kpi-sub">aguardando inspeção</div></div>
-    <div class="kpi-card green"><div class="kpi-label">Aprovados/Expedidos</div><div class="kpi-value">${aprovado + expedido}</div><div class="kpi-sub">concluídos</div></div>
-    ${reprovado > 0 ? `<div class="kpi-card red"><div class="kpi-label">Reprovados</div><div class="kpi-value">${reprovado}</div><div class="kpi-sub">necessitam ação</div></div>` : ''}
+    <div class="kpi-card amber clickable" onclick="kpiClick('em_prod')"><div class="kpi-label">Em Produção</div><div class="kpi-value">${em_prod}</div><div class="kpi-sub">máquinas ativas</div></div>
+    <div class="kpi-card violet clickable" onclick="kpiClick('cargas_planej')"><div class="kpi-label">Cargas Planejadas</div><div class="kpi-value">${cargas_planej}</div><div class="kpi-sub">aguardando liberação</div></div>
+    <div class="kpi-card green clickable" onclick="kpiClick('cargas_lib')"><div class="kpi-label">Cargas Liberadas</div><div class="kpi-value">${cargas_lib}</div><div class="kpi-sub">em produção</div></div>
+    <div class="kpi-card blue clickable" onclick="kpiClick('est_banho')"><div class="kpi-label">Estoque Banho</div><div class="kpi-value">${est_banho}</div><div class="kpi-sub">disponíveis</div></div>
+    <div class="kpi-card teal clickable" onclick="kpiClick('est_pa')"><div class="kpi-label">Estoque PA</div><div class="kpi-value">${est_pa}</div><div class="kpi-sub">prod. acabado</div></div>
+    <div class="kpi-card amber clickable" onclick="kpiClick('qualidade')"><div class="kpi-label">Em Qualidade</div><div class="kpi-value">${qualidade}</div><div class="kpi-sub">aguardando inspeção</div></div>
+    <div class="kpi-card green clickable" onclick="kpiClick('concluidos')"><div class="kpi-label">Aprovados/Expedidos</div><div class="kpi-value">${aprovado + expedido}</div><div class="kpi-sub">concluídos</div></div>
+    ${reprovado > 0 ? `<div class="kpi-card red clickable" onclick="kpiClick('reprovados')"><div class="kpi-label">Reprovados</div><div class="kpi-value">${reprovado}</div><div class="kpi-sub">necessitam ação</div></div>` : ''}
   </div>
 
   <div class="section-header" style="margin-bottom:12px">
@@ -2693,6 +2706,72 @@ function showToast(msg, type='info') {
 document.querySelectorAll('.modal-overlay').forEach(el => {
   el.addEventListener('click', e => { if(e.target === el) el.classList.remove('open'); });
 });
+
+// ═══════════════════════════════════════════════════
+//  KPI DRILL-DOWN (clique nos cards do dashboard)
+// ═══════════════════════════════════════════════════
+function kpiClick(tipo) {
+  switch (tipo) {
+    case 'em_prod':       navTo('pipeline'); break;
+    case 'cargas_planej': navTo('cargas'); break;
+    case 'cargas_lib':    navTo('cargas'); break;
+    case 'est_banho':     navTo('estoque-banho'); break;
+    case 'est_pa':        navTo('estoque-pa'); break;
+    case 'qualidade':     navTo('qualidade'); break;
+    case 'concluidos':    abrirKpiDrill('concluidos'); break;
+    case 'reprovados':    abrirKpiDrill('reprovados'); break;
+  }
+}
+
+function abrirKpiDrill(tipo) {
+  let titulo, subt, ordens;
+  if (tipo === 'concluidos') {
+    titulo = '✅ Aprovados / Expedidos';
+    subt = 'Máquinas concluídas (saíram da produção ou foram para estoque PA)';
+    ordens = state.ordens.filter(o => o.status === 'APROVADO' || o.status === 'EXPEDIDO');
+  } else {
+    titulo = '❌ Máquinas Reprovadas';
+    subt = 'Itens com reprovação ativa em retrabalho';
+    ordens = state.ordens.filter(o => o.status === 'REPROVADO' || (o.reprovacao && o.status === 'EM_PRODUCAO'));
+  }
+
+  document.getElementById('kpi-drill-titulo').textContent = titulo;
+  document.getElementById('kpi-drill-sub').textContent = `${subt} · ${ordens.length} ${ordens.length === 1 ? 'item' : 'itens'}`;
+
+  const conteudo = document.getElementById('kpi-drill-conteudo');
+  if (ordens.length === 0) {
+    conteudo.innerHTML = `<div class="empty-state"><div class="empty-icon">📭</div><div class="empty-title">Nenhum item</div></div>`;
+  } else {
+    conteudo.innerHTML = `
+      <div class="table-wrap">
+        <div class="table-scroll-wrap">
+        <table>
+          <thead><tr>
+            <th>OP</th><th>Carga</th><th>Produto</th><th>Cor</th>
+            <th>Status</th><th>Setor</th>${tipo==='reprovados'?'<th>Motivo</th>':''}
+          </tr></thead>
+          <tbody>
+            ${ordens.map(o => {
+              const carga = state.cargas.find(c => c.id === o.cargaId);
+              return `<tr>
+                <td class="td-mono">${o.op || '—'}</td>
+                <td class="td-mono">${carga ? carga.numero : (o.producaoEstoque ? '<span class="badge-stock-prod">PROD. ESTOQUE</span>' : '—')}</td>
+                <td class="td-product">${o.produto}</td>
+                <td class="td-color">${o.cor || '—'}</td>
+                <td><span class="badge ${o.status==='APROVADO'?'badge-green':o.status==='EXPEDIDO'?'badge-amber':'badge-red'}">${o.status}</span></td>
+                <td><span class="badge ${getSetorBadgeClass(o.setorAtual)}">${o.setorAtual}</span></td>
+                ${tipo==='reprovados' ? `<td style="font-size:12px;max-width:200px">${o.reprovacao ? `<b>${o.reprovacao.tipo}</b><br><span style="color:var(--text3)">${o.reprovacao.motivo}</span>` : '—'}</td>` : ''}
+              </tr>`;
+            }).join('')}
+          </tbody>
+        </table>
+        </div>
+      </div>`;
+  }
+
+  document.getElementById('modal-kpi-drill').classList.add('open');
+}
+
 
 // ═══════════════════════════════════════════════════
 //  MOBILE NAV (drawer) + PWA
