@@ -2,8 +2,20 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MES — Controle de Produção</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no">
+<title>LION MES — Controle de Produção</title>
+<!-- PWA -->
+<meta name="theme-color" content="#070d1a">
+<meta name="application-name" content="LION MES">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="LION MES">
+<meta name="format-detection" content="telephone=no">
+<meta name="msapplication-TileColor" content="#070d1a">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect width='180' height='180' rx='32' fill='%23070d1a'/><rect x='30' y='30' width='120' height='120' rx='18' fill='%23f59e0b'/><text x='90' y='122' font-family='Arial Black,Arial,sans-serif' font-size='86' font-weight='900' text-anchor='middle' fill='%23070d1a'>L</text></svg>">
+<link rel="apple-touch-icon" href="icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -505,10 +517,286 @@ tbody td { padding: 12px 14px; font-size: 14px; vertical-align: middle; }
 /* ── SCROLLABLE TABLE WRAP ─── */
 .table-scroll-wrap { overflow-x: auto; }
 
-/* ── RESPONSIVE helpers ─── */
+/* ── CARGA CARDS ─── */
+.carga-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 18px;
+  margin-bottom: 14px;
+  transition: border-color 0.2s;
+}
+.carga-card:hover { border-color: var(--border2); }
+.carga-card.released { border-left: 3px solid var(--green); }
+.carga-card.planned { border-left: 3px solid var(--amber); }
+.carga-card-top {
+  display: flex; justify-content: space-between; align-items: flex-start;
+  gap: 16px; margin-bottom: 14px; flex-wrap: wrap;
+}
+.carga-card-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 22px; font-weight: 700; color: var(--amber);
+  letter-spacing: 1px;
+}
+.carga-card-meta { font-size: 12px; color: var(--text3); margin-top: 4px; font-family: 'JetBrains Mono', monospace; }
+.carga-machines-list { margin-top: 10px; }
+.carga-machine-row {
+  display: grid;
+  grid-template-columns: minmax(180px, 2fr) 110px 110px 1fr 90px;
+  gap: 12px; align-items: center;
+  padding: 10px 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  margin-bottom: 6px;
+  font-size: 13px;
+}
+.carga-machine-row .src-tag {
+  font-size: 10px; padding: 2px 6px; border-radius: 3px;
+  font-family: 'JetBrains Mono', monospace; letter-spacing: 0.5px;
+  display: inline-block; font-weight: 700;
+}
+.src-NOVA { background: rgba(245,158,11,0.15); color: var(--amber); }
+.src-ESTOQUE_BANHO { background: rgba(20,184,166,0.15); color: var(--teal); }
+.src-ESTOQUE_PA { background: rgba(34,197,94,0.15); color: var(--green); }
+.btn-icon-mini {
+  background: none; border: 1px solid var(--border2);
+  color: var(--text3); padding: 4px 8px; border-radius: 4px;
+  cursor: pointer; font-size: 12px; transition: all 0.15s;
+}
+.btn-icon-mini:hover { color: var(--red); border-color: var(--red); }
+.carga-card-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+/* ── STOCK SELECTOR ─── */
+.stock-option {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 12px 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.stock-option:hover { border-color: var(--amber); background: var(--card2); }
+.stock-option-info { display: flex; flex-direction: column; gap: 2px; }
+.stock-option-title { font-weight: 600; font-size: 13px; }
+.stock-option-sub { font-size: 11px; color: var(--text3); font-family: 'JetBrains Mono', monospace; }
+
+/* ── PIPELINE FILTERS extra ─── */
+.pipeline-filters {
+  display: flex; gap: 10px; margin-bottom: 18px; flex-wrap: wrap;
+  padding: 12px; background: var(--card);
+  border: 1px solid var(--border); border-radius: var(--r);
+}
+.pipeline-filters .filter-input,
+.pipeline-filters .filter-select { flex: 1; min-width: 160px; }
+
+/* ── REJEIÇÃO BADGES ─── */
+.badge-reject-mont { background: rgba(239,68,68,0.15); color: var(--red); border:1px solid rgba(239,68,68,0.3); }
+.badge-reject-caren { background: rgba(139,92,246,0.15); color: var(--violet); border:1px solid rgba(139,92,246,0.3); }
+.badge-stock-prod { background: rgba(20,184,166,0.15); color: var(--teal); border:1px solid rgba(20,184,166,0.3); font-size:10px; }
+
+/* ── EMPTY MACHINES IN CARGA ─── */
+.empty-mini {
+  padding: 20px; text-align: center; color: var(--text3);
+  font-size: 12px; background: var(--surface);
+  border: 1px dashed var(--border); border-radius: 6px;
+}
+.read-only-banner {
+  background: rgba(59,130,246,0.08);
+  border: 1px solid rgba(59,130,246,0.25);
+  border-radius: var(--r);
+  padding: 12px 16px;
+  font-size: 13px; color: var(--text2);
+  margin-bottom: 16px;
+}
+.read-only-banner strong { color: var(--blue); }
+
+/* ── PWA / MOBILE BASE ─── */
+html, body {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  touch-action: manipulation;
+  overscroll-behavior: none;
+}
+input, textarea, select { -webkit-user-select: text; user-select: text; }
+button, .nav-item, .modal-overlay, .order-card, .estoque-card, .carga-card { -webkit-user-select: none; user-select: none; }
+
+/* ── HAMBURGER (mobile only) ─── */
+.hamburger-btn {
+  display: none;
+  width: 40px; height: 40px; min-width: 40px;
+  background: transparent; border: 1px solid var(--border);
+  border-radius: 8px; cursor: pointer;
+  flex-direction: column; justify-content: center; align-items: center;
+  gap: 4px; padding: 0; margin-right: 4px;
+  transition: background 0.15s;
+}
+.hamburger-btn:active { background: var(--card); }
+.hamburger-btn span {
+  display: block; width: 18px; height: 2px;
+  background: var(--text); border-radius: 2px;
+  transition: transform 0.2s, opacity 0.2s;
+}
+.topbar-titles { flex: 1; min-width: 0; overflow: hidden; }
+.topbar-title { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* ── MOBILE OVERLAY (drawer scrim) ─── */
+.mobile-overlay {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.6);
+  z-index: 50;
+  animation: fadeIn 0.2s;
+}
+.mobile-overlay.show { display: block; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+/* ── iOS SAFE AREAS ─── */
+@supports (padding: env(safe-area-inset-top)) {
+  body { padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); background: var(--bg); }
+  body { padding: 0; } /* default — components opt-in */
+  .topbar { padding-top: calc(env(safe-area-inset-top) * 0.5); }
+  .sidebar { padding-top: env(safe-area-inset-top); }
+  .content { padding-bottom: calc(24px + env(safe-area-inset-bottom)); }
+  .modal { padding-bottom: max(28px, env(safe-area-inset-bottom)); }
+  #login-screen { padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); }
+}
+
+/* ── TABLET (≤ 1024px) ─── */
+@media (max-width: 1024px) {
+  .sidebar { width: 220px; min-width: 220px; }
+  .kpi-grid { grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; }
+  .kpi-value { font-size: 28px; }
+  .order-card-grid { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
+  .estoque-grid { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); }
+  .content { padding: 16px; }
+}
+
+/* ── MOBILE (≤ 768px) ─── */
 @media (max-width: 768px) {
-  .modal-info-grid { grid-template-columns: 1fr; }
-  .form-grid { grid-template-columns: 1fr; }
+  body { font-size: 14px; }
+
+  /* Login */
+  .login-box { width: 100%; max-width: 100%; padding: 32px 24px; border-radius: 0; min-height: 100vh; border: none; box-shadow: none; display: flex; flex-direction: column; justify-content: center; }
+  .login-title { font-size: 24px; }
+
+  /* App shell — sidebar vira drawer */
+  .sidebar {
+    position: fixed; left: 0; top: 0; bottom: 0;
+    width: 280px; min-width: 280px; height: 100vh; height: 100dvh;
+    z-index: 60;
+    transform: translateX(-100%);
+    transition: transform 0.25s ease;
+    box-shadow: 4px 0 24px rgba(0,0,0,0.5);
+  }
+  .sidebar.mobile-open { transform: translateX(0); }
+  .sidebar.collapsed { width: 280px; min-width: 280px; } /* ignora collapse no mobile */
+  .toggle-sidebar { display: none; }
+
+  /* Hamburger visível */
+  .hamburger-btn { display: flex; }
+
+  /* Topbar enxuta */
+  .main-area { width: 100%; }
+  .topbar { padding: 0 14px; height: 54px; min-height: 54px; gap: 10px; }
+  .topbar-title { font-size: 17px; }
+  .topbar-subtitle { display: none; }
+  .topbar-actions .btn-sm { padding: 8px 10px; font-size: 12px; }
+
+  /* Content */
+  .content { padding: 14px; }
+
+  /* KPIs em 2 colunas */
+  .kpi-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 16px; }
+  .kpi-card { padding: 14px; }
+  .kpi-value { font-size: 24px; }
+  .kpi-label { font-size: 10px; }
+  .kpi-sub { font-size: 11px; }
+
+  /* Section header empilha */
+  .section-header { flex-wrap: wrap; gap: 10px; }
+
+  /* Cards de pedidos / estoque — 1 coluna */
+  .order-card-grid { grid-template-columns: 1fr; gap: 12px; }
+  .estoque-grid { grid-template-columns: 1fr; gap: 12px; }
+  .order-card, .estoque-card, .quality-order-card { padding: 14px; }
+  .order-card-product { font-size: 15px; }
+  .order-card-footer { flex-wrap: wrap; }
+
+  /* Cargas */
+  .carga-machine-row { grid-template-columns: 1fr !important; gap: 4px !important; padding: 10px !important; }
+
+  /* Pipeline kanban — scroll horizontal com snap */
+  .pipeline {
+    flex-direction: row; overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 8px;
+  }
+  .pipeline-step {
+    min-width: 160px; flex-shrink: 0;
+    scroll-snap-align: start;
+  }
+  .pipeline-step + .pipeline-step::before { display: none; }
+
+  /* Filtros do pipeline empilhados */
+  .pipeline-filters { flex-wrap: wrap; gap: 8px; }
+  .pipeline-filters > * { flex: 1 1 100%; }
+
+  /* Tabs com scroll horizontal */
+  .tabs { overflow-x: auto; -webkit-overflow-scrolling: touch; flex-wrap: nowrap; }
+  .tab { white-space: nowrap; flex-shrink: 0; }
+
+  /* Tabelas — scroll horizontal */
+  .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .table-filters { flex-wrap: wrap; padding: 12px; gap: 8px; }
+  .table-filters .filter-input,
+  .table-filters .filter-select { width: 100%; min-width: 0; }
+
+  /* Modais — fullscreen */
+  .modal-overlay { padding: 0; align-items: stretch; }
+  .modal {
+    width: 100%; max-width: 100%; height: 100vh; height: 100dvh; max-height: 100dvh;
+    border-radius: 0; padding: 20px 18px;
+    overflow-y: auto; -webkit-overflow-scrolling: touch;
+  }
+  .modal-title { font-size: 18px; }
+  .modal-info-grid { grid-template-columns: 1fr; gap: 10px; }
+  .form-grid { grid-template-columns: 1fr !important; gap: 14px; }
+  .form-check-grid { grid-template-columns: 1fr; gap: 12px; }
+  .modal-actions { flex-direction: column-reverse; gap: 10px; margin-top: 16px; }
+  .modal-actions .btn-sm { width: 100%; padding: 13px; font-size: 14px; min-height: 46px; }
+  .modal-from-to { padding: 12px; gap: 8px; }
+  .modal-arrow { font-size: 16px; }
+
+  /* Inputs maiores p/ toque + sem zoom no iOS (16px) */
+  .form-input, .form-select, .filter-input, .filter-select { font-size: 16px; padding: 12px 14px; min-height: 46px; }
+
+  /* Botões de ação */
+  .btn-sm { min-height: 38px; padding: 9px 12px; }
+  .btn-primary { padding: 15px; font-size: 16px; min-height: 50px; }
+
+  /* Empty state */
+  .empty-state { padding: 40px 16px; }
+  .empty-icon { font-size: 40px; }
+
+  /* Toast subindo do bottom + safe area */
+  #toast { left: 14px !important; right: 14px !important; bottom: calc(20px + env(safe-area-inset-bottom)) !important; max-width: none !important; }
+}
+
+/* ── MOBILE PEQUENO (≤ 380px) ─── */
+@media (max-width: 380px) {
+  .kpi-grid { grid-template-columns: 1fr; }
+  .topbar { padding: 0 10px; }
+  .content { padding: 10px; }
+}
+
+/* ── ORIENTAÇÃO PAISAGEM EM MOBILE — sidebar ainda drawer ─── */
+@media (max-height: 500px) and (max-width: 900px) {
+  .login-box { padding: 20px; }
+  .modal { padding: 16px; }
 }
 </style>
 </head>
@@ -566,10 +854,16 @@ tbody td { padding: 12px 14px; font-size: 14px; vertical-align: middle; }
     </div>
   </nav>
 
+  <!-- MOBILE OVERLAY -->
+  <div class="mobile-overlay" id="mobile-overlay" onclick="closeMobileSidebar()"></div>
+
   <!-- MAIN -->
   <div class="main-area">
     <div class="topbar">
-      <div>
+      <button class="hamburger-btn" id="hamburger-btn" onclick="toggleMobileSidebar()" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+      <div class="topbar-titles">
         <div class="topbar-title" id="topbar-title">Dashboard</div>
         <div class="topbar-subtitle" id="topbar-subtitle">Carregando...</div>
       </div>
@@ -644,6 +938,77 @@ tbody td { padding: 12px 14px; font-size: 14px; vertical-align: middle; }
   </div>
 </div>
 
+<!-- ══════════ NOVO MODAL: NOVA CARGA ══════════ -->
+<div class="modal-overlay" id="modal-nova-carga">
+  <div class="modal" style="width:520px">
+    <div class="modal-title">Nova Carga</div>
+    <div class="modal-sub">Crie uma carga (romaneio) para agrupar máquinas que serão produzidas em conjunto.</div>
+    <div class="form-grid" style="margin-top:14px">
+      <div class="form-group">
+        <label class="form-label">Número da Carga *</label>
+        <input type="text" class="form-input" id="nc-numero" placeholder="Ex: 10500">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Semana de Produção *</label>
+        <input type="text" class="form-input" id="nc-semana" placeholder="Ex: 1° SEM MAIO 26" value="1° SEM MAIO 26">
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-sm btn-outline" onclick="closeModal('modal-nova-carga')">Cancelar</button>
+      <button class="btn-sm btn-amber" onclick="salvarNovaCarga()">➕ Criar Carga</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ NOVO MODAL: ADICIONAR MÁQUINA À CARGA ══════════ -->
+<div class="modal-overlay" id="modal-add-maquina">
+  <div class="modal" style="width:720px;max-height:92vh;overflow-y:auto">
+    <div class="modal-title">Adicionar Máquina à Carga</div>
+    <div class="modal-sub" id="mam-sub">Configure a máquina e seus atributos de fluxo.</div>
+    <div id="mam-body"></div>
+    <div class="modal-actions">
+      <button class="btn-sm btn-outline" onclick="closeModal('modal-add-maquina')">Cancelar</button>
+      <button class="btn-sm btn-amber" id="mam-save-btn" onclick="salvarMaquinaCarga()">➕ Adicionar Máquina</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ NOVO MODAL: REPROVAÇÃO QUALIDADE ══════════ -->
+<div class="modal-overlay" id="modal-reprovar">
+  <div class="modal" style="width:560px">
+    <div class="modal-title" style="color:var(--red)">Reprovar Produto</div>
+    <div class="modal-sub" id="modal-rep-sub">Informe o tipo e o motivo da reprovação.</div>
+    <div class="form-group" style="margin-top:14px">
+      <label class="form-label">Tipo de Reprovação *</label>
+      <select class="form-select" id="rep-tipo">
+        <option value="MONTAGEM">Reprovado Montagem (volta para Mont. Final)</option>
+        <option value="CARENAGEM" id="rep-opt-caren">Reprovado Carenagem (volta para Carenagem)</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Motivo / Descrição *</label>
+      <textarea class="form-input" id="rep-motivo" rows="4" placeholder="Descreva detalhadamente o motivo da reprovação..." style="resize:vertical;min-height:80px;font-family:'Rajdhani',sans-serif"></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-sm btn-outline" onclick="closeModal('modal-reprovar')">Cancelar</button>
+      <button class="btn-sm btn-red" onclick="confirmarReprovacao()">✗ Confirmar Reprovação</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ NOVO MODAL: PRODUÇÃO PARA ESTOQUE ══════════ -->
+<div class="modal-overlay" id="modal-prod-estoque">
+  <div class="modal" style="width:680px;max-height:90vh;overflow-y:auto">
+    <div class="modal-title">Nova Produção para Estoque</div>
+    <div class="modal-sub">Crie uma máquina sem carga associada — irá direto para Corte como produção de estoque.</div>
+    <div id="prod-estoque-form"></div>
+    <div class="modal-actions">
+      <button class="btn-sm btn-outline" onclick="closeModal('modal-prod-estoque')">Cancelar</button>
+      <button class="btn-sm btn-amber" onclick="salvarProdEstoque()">➕ Iniciar Produção</button>
+    </div>
+  </div>
+</div>
+
 <!-- TOAST -->
 <div id="toast"></div>
 
@@ -674,64 +1039,118 @@ const SETOR_ICON = {
   'CORTE':'✂','DOBRA':'🔧','ALM. FUNDO':'📦','ROBÔ':'🤖','PRÉ MONT.':'🔩',
   'MONT.01':'🏗','ACABAMENTO':'⚡','BANHO':'💧','PINTURA':'🎨','ALM. FRENTE':'📫',
   'MONT. FINAL':'🏁','CARENAGEM':'🛡','QUALIDADE':'✅','EXPEDIÇÃO':'🚚',
-  'ESTOQUE BANHO':'🗄','NAO_LIBERADO':'📋'
+  'ESTOQUE BANHO':'🗄','ESTOQUE PA':'🏷','PLANEJADA':'📋'
 };
 
 // ═══════════════════════════════════════════════════
-//  DATA — ORDENS INICIAIS (do Excel)
+//  DATA — CATÁLOGO DE PRODUTOS (cadastro)
 // ═══════════════════════════════════════════════════
+// Cada produto traz os atributos PADRÃO de fluxo. PCP pode ajustar por unidade.
+const PRODUTOS_CATALOGO = [
+  { codigo:'10032', nome:'ELEVAÇÃO PÉLVICA (GIII) PESO LIVRE',                temDobra:true,  temRobo:true,  temCarenagem:false },
+  { codigo:'08231', nome:'REMADA SENTADA OPTIMUS',                            temDobra:true,  temRobo:false, temCarenagem:false },
+  { codigo:'13971', nome:'ELEVAÇÃO PÉLVICA GUIADA PESO LIVRE',                 temDobra:true,  temRobo:false, temCarenagem:false },
+  { codigo:'07585', nome:'ROSCA SCOTT (GII) PESO LIVRE',                       temDobra:true,  temRobo:false, temCarenagem:false },
+  { codigo:'14108', nome:'PUXADA 2X1 IRIDIUM P-90',                            temDobra:true,  temRobo:false, temCarenagem:true  },
+  { codigo:'08713', nome:'EXTENSOR IRIDIUM',                                   temDobra:true,  temRobo:false, temCarenagem:true  },
+  { codigo:'10151', nome:'GLUTEO GUIADO PESO LIVRE',                           temDobra:true,  temRobo:false, temCarenagem:false },
+  { codigo:'11011', nome:'REMADA GUIADA 45° PESO LIVRE',                       temDobra:true,  temRobo:false, temCarenagem:false },
+  { codigo:'13634', nome:'EXTENSOR COM INCLINAÇÃO IRIDIUM',                    temDobra:true,  temRobo:false, temCarenagem:true  },
+  { codigo:'08305', nome:'ADUTOR/ABDUTOR CONJ. LF-R',                          temDobra:true,  temRobo:false, temCarenagem:true  },
+  { codigo:'13499', nome:'EXTENSOR COM INCLINAÇÃO LF-R',                       temDobra:true,  temRobo:false, temCarenagem:true  },
+  { codigo:'08307', nome:'FLEXOR DEITADO LF-R',                                temDobra:true,  temRobo:false, temCarenagem:true  },
+  { codigo:'08282', nome:'FLEXOR SENTADO LF-R',                                temDobra:true,  temRobo:false, temCarenagem:true  },
+  { codigo:'08281', nome:'EXTENSOR LF-R',                                      temDobra:true,  temRobo:false, temCarenagem:true  },
+  { codigo:'08436', nome:'FLEXOR SENTADO PRÓ',                                 temDobra:true,  temRobo:false, temCarenagem:true  },
+  { codigo:'08745', nome:'PANTURRILHA IRIDIUM',                                temDobra:true,  temRobo:false, temCarenagem:true  },
+  { codigo:'12002', nome:'MONO CROSS ORBITAL GII LF-R',                        temDobra:true,  temRobo:false, temCarenagem:true  },
+  { codigo:'08712', nome:'EXTENSOR / FLEXOR SENTADO CONJ. IRIDIUM',            temDobra:true,  temRobo:false, temCarenagem:true  },
+  { codigo:'10152', nome:'ABDUTOR EM PÉ OPTIMUS',                              temDobra:false, temRobo:false, temCarenagem:false },
+  { codigo:'10735', nome:'SQUAT BELT PESO LIVRE',                              temDobra:false, temRobo:false, temCarenagem:false },
+  { codigo:'10736', nome:'PUXADA ALTA VERTICAL OPTIMUS',                       temDobra:false, temRobo:false, temCarenagem:false },
+  { codigo:'08717', nome:'FLEXOR SENTADO IRIDIUM',                             temDobra:false, temRobo:false, temCarenagem:false },
+  { codigo:'14403', nome:'HACK AGACHAMENTO KRATOS',                            temDobra:false, temRobo:false, temCarenagem:false },
+  { codigo:'08232', nome:'PUXADA ALTA OPTIMUS',                                temDobra:true,  temRobo:false, temCarenagem:false },
+  { codigo:'11608', nome:'LEG PRESS 45° (GII) PESO LIVRE',                     temDobra:true,  temRobo:false, temCarenagem:false },
+];
+
+// ═══════════════════════════════════════════════════
+//  DATA — CARGAS INICIAIS
+// ═══════════════════════════════════════════════════
+const CARGAS_INICIAIS = [
+  { id:'CG-10470', numero:'10470', semana:'1° SEM MAIO 26', status:'LIBERADA', dataCriacao:'2026-04-25T08:00:00', dataLiberacao:'2026-04-26T09:00:00' },
+  { id:'CG-10477', numero:'10477', semana:'1° SEM MAIO 26', status:'LIBERADA', dataCriacao:'2026-04-25T09:00:00', dataLiberacao:'2026-04-26T10:00:00' },
+  { id:'CG-10478', numero:'10478', semana:'1° SEM MAIO 26', status:'LIBERADA', dataCriacao:'2026-04-25T10:00:00', dataLiberacao:'2026-04-26T11:00:00' },
+  { id:'CG-10488', numero:'10488', semana:'1° SEM MAIO 26', status:'LIBERADA', dataCriacao:'2026-04-25T11:00:00', dataLiberacao:'2026-04-26T12:00:00' },
+  { id:'CG-10490', numero:'10490', semana:'1° SEM MAIO 26', status:'LIBERADA', dataCriacao:'2026-04-25T12:00:00', dataLiberacao:'2026-04-26T13:00:00' },
+  { id:'CG-10500', numero:'10500', semana:'2° SEM MAIO 26', status:'PLANEJADA', dataCriacao:'2026-04-27T08:00:00', dataLiberacao:null },
+];
+
+// ═══════════════════════════════════════════════════
+//  DATA — ORDENS / MÁQUINAS INICIAIS
+// ═══════════════════════════════════════════════════
+// Estrutura: cada ordem é uma MÁQUINA UNITÁRIA dentro de uma carga (ou produção para estoque).
+// Campos novos:
+//   cargaId            → referência à carga (null para produção para estoque)
+//   producaoEstoque    → true se for "Produção para Estoque" (sem carga)
+//   origemEstoque      → null | 'BANHO' | 'PA'  (rastreio quando puxado de estoque na programação)
+//   pulaCarenagem      → true se reprovado em montagem (após retrabalho, pula carenagem)
+//   reprovacao         → { tipo, motivo, data } quando reprovado
 const ORDENS_INICIAIS = [
-  // ─── CORTE ───
-  {id:'ORD-001',carga:'10470',op:null,produto:'10032 - ELEVAÇÃO PÉLVICA (GIII) PESO LIVRE',cor:'PRETO FOSCO',dataEntrega:'2026-05-04',semana:'1° SEM MAIO 26',temDobra:true,temRobo:true,temCarenagem:false,setorAtual:'CORTE',setoresConcluidos:[],status:'EM_PRODUCAO'},
-  {id:'ORD-002',carga:'10470',op:386234,produto:'08231 - REMADA SENTADA OPTIMUS AM',cor:'ONIX',dataEntrega:'2026-05-04',semana:'1° SEM MAIO 26',temDobra:true,temRobo:false,temCarenagem:false,setorAtual:'CORTE',setoresConcluidos:[],status:'EM_PRODUCAO'},
-  {id:'ORD-003',carga:'10470',op:null,produto:'13971 - ELEVAÇÃO PÉLVICA GUIADA PESO LIVRE PRA',cor:'ONIX',dataEntrega:'2026-05-04',semana:'1° SEM MAIO 26',temDobra:true,temRobo:false,temCarenagem:false,setorAtual:'CORTE',setoresConcluidos:[],status:'EM_PRODUCAO'},
-  {id:'ORD-004',carga:'10477',op:null,produto:'13971 - ELEVAÇÃO PÉLVICA GUIADA PESO LIVRE PRA',cor:'PRETO FOSCO',dataEntrega:'2026-05-04',semana:'1° SEM MAIO 26',temDobra:true,temRobo:false,temCarenagem:false,setorAtual:'CORTE',setoresConcluidos:[],status:'EM_PRODUCAO'},
-  {id:'ORD-005',carga:'10477',op:null,produto:'07585 - ROSCA SCOTT (GII) PESO LIVRE PRA',cor:'PRETO FOSCO',dataEntrega:'2026-05-04',semana:'1° SEM MAIO 26',temDobra:true,temRobo:false,temCarenagem:false,setorAtual:'CORTE',setoresConcluidos:[],status:'EM_PRODUCAO'},
-  // ─── DOBRA ───
-  {id:'ORD-006',carga:'10488',op:null,produto:'14108 - PUXADA 2X1 IRIDIUM P-90 PRA',cor:'PRETO FOSCO',dataEntrega:'2026-05-05',semana:'1° SEM MAIO 26',temDobra:true,temRobo:false,temCarenagem:true,setorAtual:'DOBRA',setoresConcluidos:['CORTE'],status:'EM_PRODUCAO'},
-  {id:'ORD-007',carga:'10490',op:null,produto:'08713 - EXTENSOR IRIDIUM PRA',cor:'PRETO FOSCO',dataEntrega:'2026-05-06',semana:'1° SEM MAIO 26',temDobra:true,temRobo:false,temCarenagem:true,setorAtual:'DOBRA',setoresConcluidos:['CORTE'],status:'EM_PRODUCAO'},
-  // ─── ALM. FUNDO ───
-  {id:'ORD-008',carga:'10477',op:386286,produto:'10151 - GLUTEO GUIADO PESO LIVRE PRA',cor:'PRETO FOSCO',dataEntrega:'2026-05-04',semana:'1° SEM MAIO 26',temDobra:true,temRobo:false,temCarenagem:false,setorAtual:'ALM. FUNDO',setoresConcluidos:['CORTE','DOBRA'],status:'EM_PRODUCAO'},
-  {id:'ORD-009',carga:'10477',op:386322,produto:'11011 - REMADA GUIADA 45° PESO LIVRE PRA',cor:'PRETO FOSCO',dataEntrega:'2026-05-04',semana:'1° SEM MAIO 26',temDobra:true,temRobo:false,temCarenagem:false,setorAtual:'ALM. FUNDO',setoresConcluidos:['CORTE','DOBRA'],status:'EM_PRODUCAO'},
-  // ─── ROBÔ ───
-  {id:'ORD-010',carga:'ESTOQUE',op:null,produto:'10032 - ELEVAÇÃO PÉLVICA (GIII) PESO LIVRE',cor:null,dataEntrega:null,semana:'1° SEM MAIO 26',temDobra:true,temRobo:true,temCarenagem:false,setorAtual:'ROBÔ',setoresConcluidos:['CORTE','DOBRA','ALM. FUNDO'],status:'EM_PRODUCAO'},
-  // ─── PRÉ MONT. ───
-  {id:'ORD-011',carga:'10477',op:null,produto:'13634 - EXTENSOR COM INCLINAÇÃO IRIDIUM PRA',cor:'PRETO FOSCO',dataEntrega:'2026-05-04',semana:'1° SEM MAIO 26',temDobra:true,temRobo:false,temCarenagem:true,setorAtual:'PRÉ MONT.',setoresConcluidos:['CORTE','DOBRA','ALM. FUNDO'],status:'EM_PRODUCAO'},
-  {id:'ORD-012',carga:'10477',op:386255,produto:'08305 - ADUTOR/ABDUTOR CONJ. LF-R AM',cor:'ONIX',dataEntrega:'2026-05-04',semana:'1° SEM MAIO 26',temDobra:true,temRobo:false,temCarenagem:true,setorAtual:'PRÉ MONT.',setoresConcluidos:['CORTE','DOBRA','ALM. FUNDO'],status:'EM_PRODUCAO'},
-  {id:'ORD-013',carga:'10477',op:386259,produto:'13499 - EXTENSOR COM INCLINAÇÃO LF-R AM',cor:'ONIX',dataEntrega:'2026-05-04',semana:'1° SEM MAIO 26',temDobra:true,temRobo:false,temCarenagem:true,setorAtual:'PRÉ MONT.',setoresConcluidos:['CORTE','DOBRA','ALM. FUNDO'],status:'EM_PRODUCAO'},
-  {id:'ORD-014',carga:'10477',op:null,produto:'08307 - FLEXOR DEITADO LF-R AM',cor:'ONIX',dataEntrega:'2026-05-04',semana:'1° SEM MAIO 26',temDobra:true,temRobo:false,temCarenagem:true,setorAtual:'PRÉ MONT.',setoresConcluidos:['CORTE','DOBRA','ALM. FUNDO'],status:'EM_PRODUCAO'},
-  {id:'ORD-015',carga:'10477',op:386280,produto:'08282 - FLEXOR SENTADO LF-R AM',cor:'ONIX',dataEntrega:'2026-05-04',semana:'1° SEM MAIO 26',temDobra:true,temRobo:false,temCarenagem:true,setorAtual:'PRÉ MONT.',setoresConcluidos:['CORTE','DOBRA','ALM. FUNDO'],status:'EM_PRODUCAO'},
-  {id:'ORD-016',carga:'10478',op:386322,produto:'11011 - REMADA GUIADA 45° PESO LIVRE AM',cor:'PRETO FOSCO',dataEntrega:'2026-05-05',semana:'1° SEM MAIO 26',temDobra:true,temRobo:false,temCarenagem:false,setorAtual:'PRÉ MONT.',setoresConcluidos:['CORTE','DOBRA','ALM. FUNDO'],status:'EM_PRODUCAO'},
-  // ─── MONT.01 ───
-  {id:'ORD-017',carga:'10470',op:386254,produto:'08281 - EXTENSOR LF-R PRA',cor:'PRETO FOSCO',dataEntrega:'2026-05-04',semana:'1° SEM MAIO 26',temDobra:true,temRobo:false,temCarenagem:true,setorAtual:'MONT.01',setoresConcluidos:['CORTE','DOBRA','ALM. FUNDO','PRÉ MONT.'],status:'EM_PRODUCAO'},
-  {id:'ORD-018',carga:'10470',op:386201,produto:'08436 - FLEXOR SENTADO PRÓ PRE',cor:'CINZA',dataEntrega:'2026-05-04',semana:'1° SEM MAIO 26',temDobra:true,temRobo:false,temCarenagem:true,setorAtual:'MONT.01',setoresConcluidos:['CORTE','DOBRA','ALM. FUNDO','PRÉ MONT.'],status:'EM_PRODUCAO'},
-  // ─── ACABAMENTO ───
-  {id:'ORD-019',carga:'ESTOQUE',op:null,produto:'10032 - ELEVAÇÃO PÉLVICA (GIII) PESO LIVRE',cor:null,dataEntrega:null,semana:'1° SEM MAIO 26',temDobra:true,temRobo:true,temCarenagem:false,setorAtual:'ACABAMENTO',setoresConcluidos:['CORTE','DOBRA','ALM. FUNDO','ROBÔ'],status:'EM_PRODUCAO'},
-  // ─── BANHO ───
-  {id:'ORD-020',carga:'PLANILHA BASE',op:386254,produto:'08281 - EXTENSOR LF-R PRA',cor:'PRETO FOSCO',dataEntrega:null,semana:'PLANILHA BASE',temDobra:true,temRobo:false,temCarenagem:true,setorAtual:'BANHO',setoresConcluidos:['CORTE','DOBRA','ALM. FUNDO','PRÉ MONT.','MONT.01','ACABAMENTO'],status:'EM_PRODUCAO'},
-  // ─── PINTURA ───
-  {id:'ORD-021',carga:'10478',op:null,produto:'08745 - PANTURRILHA IRIDIUM AM',cor:null,dataEntrega:'2026-05-05',semana:'1° SEM MAIO 26',temDobra:true,temRobo:false,temCarenagem:true,setorAtual:'PINTURA',setoresConcluidos:['CORTE','DOBRA','ALM. FUNDO','PRÉ MONT.','MONT.01','ACABAMENTO','BANHO'],status:'EM_PRODUCAO'},
-  // ─── ALM. FRENTE ───
-  {id:'ORD-022',carga:'10477',op:386316,produto:'12002 - MONO CROSS ORBITAL GII LF-R AM',cor:'ONIX',dataEntrega:'2026-05-04',semana:'1° SEM MAIO 26',temDobra:true,temRobo:false,temCarenagem:true,setorAtual:'ALM. FRENTE',setoresConcluidos:['CORTE','DOBRA','ALM. FUNDO','PRÉ MONT.','MONT.01','ACABAMENTO','BANHO','PINTURA'],status:'EM_PRODUCAO'},
-  // ─── MONT. FINAL ───
-  {id:'ORD-023',carga:'10470',op:null,produto:'13971 - ELEVAÇÃO PÉLVICA GUIADA PESO LIVRE AM',cor:'PRETO FOSCO',dataEntrega:'2026-05-04',semana:'1° SEM MAIO 26',temDobra:true,temRobo:false,temCarenagem:false,setorAtual:'MONT. FINAL',setoresConcluidos:['CORTE','DOBRA','ALM. FUNDO','PRÉ MONT.','MONT.01','ACABAMENTO','BANHO','PINTURA','ALM. FRENTE'],status:'EM_PRODUCAO'},
-  {id:'ORD-024',carga:'10477',op:null,produto:'13971 - ELEVAÇÃO PÉLVICA GUIADA PESO LIVRE AM',cor:'FOSCO / AMARELO',dataEntrega:'2026-05-04',semana:'1° SEM MAIO 26',temDobra:true,temRobo:false,temCarenagem:false,setorAtual:'MONT. FINAL',setoresConcluidos:['CORTE','DOBRA','ALM. FUNDO','PRÉ MONT.','MONT.01','ACABAMENTO','BANHO','PINTURA','ALM. FRENTE'],status:'EM_PRODUCAO'},
-  {id:'ORD-025',carga:'10478',op:null,produto:'13971 - ELEVAÇÃO PÉLVICA GUIADA PESO LIVRE PRA ANILHEIRO',cor:'PRETO FOSCO',dataEntrega:'2026-05-05',semana:'1° SEM MAIO 26',temDobra:true,temRobo:false,temCarenagem:false,setorAtual:'MONT. FINAL',setoresConcluidos:['CORTE','DOBRA','ALM. FUNDO','PRÉ MONT.','MONT.01','ACABAMENTO','BANHO','PINTURA','ALM. FRENTE'],status:'EM_PRODUCAO'},
-  // ─── CARENAGEM ───
-  {id:'ORD-026',carga:'10490',op:386257,produto:'08712 - EXTENSOR / FLEXOR SENTADO CONJ. IRIDIUM AM',cor:'ONIX',dataEntrega:'2026-05-06',semana:'1° SEM MAIO 26',temDobra:true,temRobo:false,temCarenagem:true,setorAtual:'CARENAGEM',setoresConcluidos:['CORTE','DOBRA','ALM. FUNDO','PRÉ MONT.','MONT.01','ACABAMENTO','BANHO','PINTURA','ALM. FRENTE','MONT. FINAL'],status:'EM_PRODUCAO'},
-  // ─── QUALIDADE ───
-  {id:'ORD-027',carga:'10478',op:'estoque',produto:'08745 - PANTURRILHA IRIDIUM AM',cor:'PRETO FOSCO',dataEntrega:'2026-05-05',semana:'1° SEM MAIO 26',temDobra:true,temRobo:false,temCarenagem:true,setorAtual:'QUALIDADE',setoresConcluidos:['CORTE','DOBRA','ALM. FUNDO','PRÉ MONT.','MONT.01','ACABAMENTO','BANHO','PINTURA','ALM. FRENTE','MONT. FINAL','CARENAGEM'],status:'EM_PRODUCAO'},
-  // ─── ESTOQUE BANHO ───
-  {id:'ORD-028',carga:'ESTOQUE',op:null,produto:'10152 - ABDUTOR EM PÉ OPTIMUS',cor:null,dataEntrega:null,semana:'1° SEM MAIO 26',temDobra:false,temRobo:false,temCarenagem:false,setorAtual:'ESTOQUE BANHO',setoresConcluidos:[],status:'ESTOQUE_BANHO'},
-  {id:'ORD-029',carga:'ESTOQUE',op:null,produto:'10735 - SQUAT BELT PESO LIVRE',cor:null,dataEntrega:null,semana:'1° SEM MAIO 26',temDobra:false,temRobo:false,temCarenagem:false,setorAtual:'ESTOQUE BANHO',setoresConcluidos:[],status:'ESTOQUE_BANHO'},
-  {id:'ORD-030',carga:'ESTOQUE',op:null,produto:'8231 - REMADA SENTADA OPTIMUS',cor:null,dataEntrega:null,semana:'1° SEM MAIO 26',temDobra:false,temRobo:false,temCarenagem:false,setorAtual:'ESTOQUE BANHO',setoresConcluidos:[],status:'ESTOQUE_BANHO'},
-  {id:'ORD-031',carga:'ESTOQUE',op:null,produto:'10736 - PUXADA ALTA VERTICAL OPTIMUS',cor:null,dataEntrega:null,semana:'1° SEM MAIO 26',temDobra:false,temRobo:false,temCarenagem:false,setorAtual:'ESTOQUE BANHO',setoresConcluidos:[],status:'ESTOQUE_BANHO'},
-  {id:'ORD-032',carga:'ESTOQUE',op:null,produto:'8717 - FLEXOR SENTADO IRIDIUM',cor:null,dataEntrega:null,semana:'1° SEM MAIO 26',temDobra:false,temRobo:false,temCarenagem:false,setorAtual:'ESTOQUE BANHO',setoresConcluidos:[],status:'ESTOQUE_BANHO'},
-  {id:'ORD-033',carga:'ESTOQUE',op:null,produto:'8282 - FLEXOR SENTADO LF-R',cor:null,dataEntrega:null,semana:'1° SEM MAIO 26',temDobra:false,temRobo:false,temCarenagem:false,setorAtual:'ESTOQUE BANHO',setoresConcluidos:[],status:'ESTOQUE_BANHO'},
-  {id:'ORD-034',carga:'ESTOQUE',op:null,produto:'14403 - HACK AGACHAMENTO KRATOS',cor:null,dataEntrega:null,semana:'1° SEM MAIO 26',temDobra:false,temRobo:false,temCarenagem:false,setorAtual:'ESTOQUE BANHO',setoresConcluidos:[],status:'ESTOQUE_BANHO'},
-  // ─── NÃO LIBERADO (planejamento) ───
-  {id:'ORD-035',carga:null,op:null,produto:'08232 - PUXADA ALTA OPTIMUS AM',cor:'ONIX',dataEntrega:null,semana:'PLANILHA BASE',temDobra:true,temRobo:false,temCarenagem:false,setorAtual:'NAO_LIBERADO',setoresConcluidos:[],status:'NAO_LIBERADO'},
-  {id:'ORD-036',carga:null,op:null,produto:'11608 - LEG PRESS 45° (GII) PESO LIVRE AM',cor:'ONIX',dataEntrega:null,semana:'PLANILHA BASE',temDobra:true,temRobo:false,temCarenagem:false,setorAtual:'NAO_LIBERADO',setoresConcluidos:[],status:'NAO_LIBERADO'},
+  // ─── CG-10470 (LIBERADA) ───
+  {id:'ORD-001',cargaId:'CG-10470',carga:'10470',op:386250,produto:'10032 - ELEVAÇÃO PÉLVICA (GIII) PESO LIVRE',cor:'PRETO FOSCO',dataEntrega:'2026-05-04',semana:'1° SEM MAIO 26',temDobra:true,temRobo:true,temCarenagem:false,setorAtual:'CORTE',setoresConcluidos:[],status:'EM_PRODUCAO'},
+  {id:'ORD-002',cargaId:'CG-10470',carga:'10470',op:386234,produto:'08231 - REMADA SENTADA OPTIMUS AM',cor:'ONIX',dataEntrega:'2026-05-04',semana:'1° SEM MAIO 26',temDobra:true,temRobo:false,temCarenagem:false,setorAtual:'CORTE',setoresConcluidos:[],status:'EM_PRODUCAO'},
+  {id:'ORD-003',cargaId:'CG-10470',carga:'10470',op:386254,produto:'08281 - EXTENSOR LF-R PRA',cor:'PRETO FOSCO',dataEntrega:'2026-05-04',semana:'1° SEM MAIO 26',temDobra:true,temRobo:false,temCarenagem:true,setorAtual:'MONT.01',setoresConcluidos:['CORTE','DOBRA','ALM. FUNDO','PRÉ MONT.'],status:'EM_PRODUCAO'},
+  {id:'ORD-004',cargaId:'CG-10470',carga:'10470',op:386201,produto:'08436 - FLEXOR SENTADO PRÓ PRE',cor:'CINZA',dataEntrega:'2026-05-04',semana:'1° SEM MAIO 26',temDobra:true,temRobo:false,temCarenagem:true,setorAtual:'MONT.01',setoresConcluidos:['CORTE','DOBRA','ALM. FUNDO','PRÉ MONT.'],status:'EM_PRODUCAO'},
+  {id:'ORD-005',cargaId:'CG-10470',carga:'10470',op:386270,produto:'13971 - ELEVAÇÃO PÉLVICA GUIADA PESO LIVRE AM',cor:'PRETO FOSCO',dataEntrega:'2026-05-04',semana:'1° SEM MAIO 26',temDobra:true,temRobo:false,temCarenagem:false,setorAtual:'MONT. FINAL',setoresConcluidos:['CORTE','DOBRA','ALM. FUNDO','PRÉ MONT.','MONT.01','ACABAMENTO','BANHO','PINTURA','ALM. FRENTE'],status:'EM_PRODUCAO'},
+
+  // ─── CG-10477 (LIBERADA) ───
+  {id:'ORD-006',cargaId:'CG-10477',carga:'10477',op:386240,produto:'13971 - ELEVAÇÃO PÉLVICA GUIADA PESO LIVRE PRA',cor:'PRETO FOSCO',dataEntrega:'2026-05-04',semana:'1° SEM MAIO 26',temDobra:true,temRobo:false,temCarenagem:false,setorAtual:'CORTE',setoresConcluidos:[],status:'EM_PRODUCAO'},
+  {id:'ORD-007',cargaId:'CG-10477',carga:'10477',op:386241,produto:'07585 - ROSCA SCOTT (GII) PESO LIVRE PRA',cor:'PRETO FOSCO',dataEntrega:'2026-05-04',semana:'1° SEM MAIO 26',temDobra:true,temRobo:false,temCarenagem:false,setorAtual:'CORTE',setoresConcluidos:[],status:'EM_PRODUCAO'},
+  {id:'ORD-008',cargaId:'CG-10477',carga:'10477',op:386286,produto:'10151 - GLUTEO GUIADO PESO LIVRE PRA',cor:'PRETO FOSCO',dataEntrega:'2026-05-04',semana:'1° SEM MAIO 26',temDobra:true,temRobo:false,temCarenagem:false,setorAtual:'ALM. FUNDO',setoresConcluidos:['CORTE','DOBRA'],status:'EM_PRODUCAO'},
+  {id:'ORD-009',cargaId:'CG-10477',carga:'10477',op:386322,produto:'11011 - REMADA GUIADA 45° PESO LIVRE PRA',cor:'PRETO FOSCO',dataEntrega:'2026-05-04',semana:'1° SEM MAIO 26',temDobra:true,temRobo:false,temCarenagem:false,setorAtual:'ALM. FUNDO',setoresConcluidos:['CORTE','DOBRA'],status:'EM_PRODUCAO'},
+  {id:'ORD-010',cargaId:'CG-10477',carga:'10477',op:386255,produto:'08305 - ADUTOR/ABDUTOR CONJ. LF-R AM',cor:'ONIX',dataEntrega:'2026-05-04',semana:'1° SEM MAIO 26',temDobra:true,temRobo:false,temCarenagem:true,setorAtual:'PRÉ MONT.',setoresConcluidos:['CORTE','DOBRA','ALM. FUNDO'],status:'EM_PRODUCAO'},
+  {id:'ORD-011',cargaId:'CG-10477',carga:'10477',op:386259,produto:'13499 - EXTENSOR COM INCLINAÇÃO LF-R AM',cor:'ONIX',dataEntrega:'2026-05-04',semana:'1° SEM MAIO 26',temDobra:true,temRobo:false,temCarenagem:true,setorAtual:'PRÉ MONT.',setoresConcluidos:['CORTE','DOBRA','ALM. FUNDO'],status:'EM_PRODUCAO'},
+  {id:'ORD-012',cargaId:'CG-10477',carga:'10477',op:386260,produto:'08307 - FLEXOR DEITADO LF-R AM',cor:'ONIX',dataEntrega:'2026-05-04',semana:'1° SEM MAIO 26',temDobra:true,temRobo:false,temCarenagem:true,setorAtual:'PRÉ MONT.',setoresConcluidos:['CORTE','DOBRA','ALM. FUNDO'],status:'EM_PRODUCAO'},
+  {id:'ORD-013',cargaId:'CG-10477',carga:'10477',op:386280,produto:'08282 - FLEXOR SENTADO LF-R AM',cor:'ONIX',dataEntrega:'2026-05-04',semana:'1° SEM MAIO 26',temDobra:true,temRobo:false,temCarenagem:true,setorAtual:'PRÉ MONT.',setoresConcluidos:['CORTE','DOBRA','ALM. FUNDO'],status:'EM_PRODUCAO'},
+  {id:'ORD-014',cargaId:'CG-10477',carga:'10477',op:386316,produto:'12002 - MONO CROSS ORBITAL GII LF-R AM',cor:'ONIX',dataEntrega:'2026-05-04',semana:'1° SEM MAIO 26',temDobra:true,temRobo:false,temCarenagem:true,setorAtual:'ALM. FRENTE',setoresConcluidos:['CORTE','DOBRA','ALM. FUNDO','PRÉ MONT.','MONT.01','ACABAMENTO','BANHO','PINTURA'],status:'EM_PRODUCAO'},
+  {id:'ORD-015',cargaId:'CG-10477',carga:'10477',op:386290,produto:'13971 - ELEVAÇÃO PÉLVICA GUIADA PESO LIVRE AM',cor:'FOSCO / AMARELO',dataEntrega:'2026-05-04',semana:'1° SEM MAIO 26',temDobra:true,temRobo:false,temCarenagem:false,setorAtual:'MONT. FINAL',setoresConcluidos:['CORTE','DOBRA','ALM. FUNDO','PRÉ MONT.','MONT.01','ACABAMENTO','BANHO','PINTURA','ALM. FRENTE'],status:'EM_PRODUCAO'},
+
+  // ─── CG-10478 (LIBERADA) ───
+  {id:'ORD-016',cargaId:'CG-10478',carga:'10478',op:386322,produto:'11011 - REMADA GUIADA 45° PESO LIVRE AM',cor:'PRETO FOSCO',dataEntrega:'2026-05-05',semana:'1° SEM MAIO 26',temDobra:true,temRobo:false,temCarenagem:false,setorAtual:'PRÉ MONT.',setoresConcluidos:['CORTE','DOBRA','ALM. FUNDO'],status:'EM_PRODUCAO'},
+  {id:'ORD-017',cargaId:'CG-10478',carga:'10478',op:386330,produto:'08745 - PANTURRILHA IRIDIUM AM',cor:'PRETO',dataEntrega:'2026-05-05',semana:'1° SEM MAIO 26',temDobra:true,temRobo:false,temCarenagem:true,setorAtual:'PINTURA',setoresConcluidos:['CORTE','DOBRA','ALM. FUNDO','PRÉ MONT.','MONT.01','ACABAMENTO','BANHO'],status:'EM_PRODUCAO'},
+  {id:'ORD-018',cargaId:'CG-10478',carga:'10478',op:386335,produto:'13971 - ELEVAÇÃO PÉLVICA GUIADA PESO LIVRE PRA ANILHEIRO',cor:'PRETO FOSCO',dataEntrega:'2026-05-05',semana:'1° SEM MAIO 26',temDobra:true,temRobo:false,temCarenagem:false,setorAtual:'MONT. FINAL',setoresConcluidos:['CORTE','DOBRA','ALM. FUNDO','PRÉ MONT.','MONT.01','ACABAMENTO','BANHO','PINTURA','ALM. FRENTE'],status:'EM_PRODUCAO'},
+  // origem estoque PA → entrou direto em qualidade (cor já existia em PA)
+  {id:'ORD-019',cargaId:'CG-10478',carga:'10478',op:386340,produto:'08745 - PANTURRILHA IRIDIUM AM',cor:'PRETO FOSCO',dataEntrega:'2026-05-05',semana:'1° SEM MAIO 26',temDobra:true,temRobo:false,temCarenagem:true,setorAtual:'QUALIDADE',setoresConcluidos:['CORTE','DOBRA','ALM. FUNDO','PRÉ MONT.','MONT.01','ACABAMENTO','BANHO','PINTURA','ALM. FRENTE','MONT. FINAL','CARENAGEM'],status:'EM_PRODUCAO',origemEstoque:'PA'},
+
+  // ─── CG-10488 (LIBERADA) ───
+  {id:'ORD-020',cargaId:'CG-10488',carga:'10488',op:386350,produto:'14108 - PUXADA 2X1 IRIDIUM P-90 PRA',cor:'PRETO FOSCO',dataEntrega:'2026-05-05',semana:'1° SEM MAIO 26',temDobra:true,temRobo:false,temCarenagem:true,setorAtual:'DOBRA',setoresConcluidos:['CORTE'],status:'EM_PRODUCAO'},
+
+  // ─── CG-10490 (LIBERADA) ───
+  {id:'ORD-021',cargaId:'CG-10490',carga:'10490',op:386360,produto:'08713 - EXTENSOR IRIDIUM PRA',cor:'PRETO FOSCO',dataEntrega:'2026-05-06',semana:'1° SEM MAIO 26',temDobra:true,temRobo:false,temCarenagem:true,setorAtual:'DOBRA',setoresConcluidos:['CORTE'],status:'EM_PRODUCAO'},
+  {id:'ORD-022',cargaId:'CG-10490',carga:'10490',op:386257,produto:'08712 - EXTENSOR / FLEXOR SENTADO CONJ. IRIDIUM AM',cor:'ONIX',dataEntrega:'2026-05-06',semana:'1° SEM MAIO 26',temDobra:true,temRobo:false,temCarenagem:true,setorAtual:'CARENAGEM',setoresConcluidos:['CORTE','DOBRA','ALM. FUNDO','PRÉ MONT.','MONT.01','ACABAMENTO','BANHO','PINTURA','ALM. FRENTE','MONT. FINAL'],status:'EM_PRODUCAO'},
+
+  // ─── CG-10500 (PLANEJADA) — não aparecem no pipeline até a liberação ───
+  {id:'ORD-023',cargaId:'CG-10500',carga:'10500',op:386400,produto:'08232 - PUXADA ALTA OPTIMUS AM',cor:'ONIX',dataEntrega:'2026-05-11',semana:'2° SEM MAIO 26',temDobra:true,temRobo:false,temCarenagem:false,setorAtual:'PLANEJADA',setoresConcluidos:[],status:'PLANEJADA'},
+  {id:'ORD-024',cargaId:'CG-10500',carga:'10500',op:386401,produto:'11608 - LEG PRESS 45° (GII) PESO LIVRE AM',cor:'ONIX',dataEntrega:'2026-05-11',semana:'2° SEM MAIO 26',temDobra:true,temRobo:false,temCarenagem:false,setorAtual:'PLANEJADA',setoresConcluidos:[],status:'PLANEJADA'},
+
+  // ─── PRODUÇÃO PARA ESTOQUE (sem carga) ───
+  {id:'ORD-025',cargaId:null,carga:null,op:'EST-001',produto:'10032 - ELEVAÇÃO PÉLVICA (GIII) PESO LIVRE',cor:'PRETO FOSCO',dataEntrega:null,semana:'1° SEM MAIO 26',temDobra:true,temRobo:true,temCarenagem:false,setorAtual:'ROBÔ',setoresConcluidos:['CORTE','DOBRA','ALM. FUNDO'],status:'EM_PRODUCAO',producaoEstoque:true},
+  {id:'ORD-026',cargaId:null,carga:null,op:'EST-002',produto:'10032 - ELEVAÇÃO PÉLVICA (GIII) PESO LIVRE',cor:'ONIX',dataEntrega:null,semana:'1° SEM MAIO 26',temDobra:true,temRobo:true,temCarenagem:false,setorAtual:'ACABAMENTO',setoresConcluidos:['CORTE','DOBRA','ALM. FUNDO','ROBÔ'],status:'EM_PRODUCAO',producaoEstoque:true},
+
+  // ─── ESTOQUE BANHO (já banhadas, prontas pra serem puxadas pelo PCP) ───
+  {id:'ORD-027',cargaId:null,carga:null,op:null,produto:'10152 - ABDUTOR EM PÉ OPTIMUS',cor:null,dataEntrega:null,semana:'1° SEM MAIO 26',temDobra:false,temRobo:false,temCarenagem:false,setorAtual:'ESTOQUE BANHO',setoresConcluidos:['CORTE','ALM. FUNDO','PRÉ MONT.','MONT.01','ACABAMENTO','BANHO'],status:'ESTOQUE_BANHO'},
+  {id:'ORD-028',cargaId:null,carga:null,op:null,produto:'10735 - SQUAT BELT PESO LIVRE',cor:null,dataEntrega:null,semana:'1° SEM MAIO 26',temDobra:false,temRobo:false,temCarenagem:false,setorAtual:'ESTOQUE BANHO',setoresConcluidos:['CORTE','ALM. FUNDO','PRÉ MONT.','MONT.01','ACABAMENTO','BANHO'],status:'ESTOQUE_BANHO'},
+  {id:'ORD-029',cargaId:null,carga:null,op:null,produto:'08231 - REMADA SENTADA OPTIMUS',cor:null,dataEntrega:null,semana:'1° SEM MAIO 26',temDobra:true,temRobo:false,temCarenagem:false,setorAtual:'ESTOQUE BANHO',setoresConcluidos:['CORTE','DOBRA','ALM. FUNDO','PRÉ MONT.','MONT.01','ACABAMENTO','BANHO'],status:'ESTOQUE_BANHO'},
+  {id:'ORD-030',cargaId:null,carga:null,op:null,produto:'10736 - PUXADA ALTA VERTICAL OPTIMUS',cor:null,dataEntrega:null,semana:'1° SEM MAIO 26',temDobra:false,temRobo:false,temCarenagem:false,setorAtual:'ESTOQUE BANHO',setoresConcluidos:['CORTE','ALM. FUNDO','PRÉ MONT.','MONT.01','ACABAMENTO','BANHO'],status:'ESTOQUE_BANHO'},
+  {id:'ORD-031',cargaId:null,carga:null,op:null,produto:'08717 - FLEXOR SENTADO IRIDIUM',cor:null,dataEntrega:null,semana:'1° SEM MAIO 26',temDobra:false,temRobo:false,temCarenagem:false,setorAtual:'ESTOQUE BANHO',setoresConcluidos:['CORTE','ALM. FUNDO','PRÉ MONT.','MONT.01','ACABAMENTO','BANHO'],status:'ESTOQUE_BANHO'},
+  {id:'ORD-032',cargaId:null,carga:null,op:null,produto:'08282 - FLEXOR SENTADO LF-R',cor:null,dataEntrega:null,semana:'1° SEM MAIO 26',temDobra:true,temRobo:false,temCarenagem:true,setorAtual:'ESTOQUE BANHO',setoresConcluidos:['CORTE','DOBRA','ALM. FUNDO','PRÉ MONT.','MONT.01','ACABAMENTO','BANHO'],status:'ESTOQUE_BANHO'},
+  {id:'ORD-033',cargaId:null,carga:null,op:null,produto:'14403 - HACK AGACHAMENTO KRATOS',cor:null,dataEntrega:null,semana:'1° SEM MAIO 26',temDobra:false,temRobo:false,temCarenagem:false,setorAtual:'ESTOQUE BANHO',setoresConcluidos:['CORTE','ALM. FUNDO','PRÉ MONT.','MONT.01','ACABAMENTO','BANHO'],status:'ESTOQUE_BANHO'},
+
+  // ─── ESTOQUE PRODUTO ACABADO (já com cor — prontas pra qualidade ou expedição) ───
+  {id:'ORD-034',cargaId:null,carga:null,op:null,produto:'08745 - PANTURRILHA IRIDIUM AM',cor:'PRETO FOSCO',dataEntrega:null,semana:'1° SEM MAIO 26',temDobra:true,temRobo:false,temCarenagem:true,setorAtual:'ESTOQUE PA',setoresConcluidos:['CORTE','DOBRA','ALM. FUNDO','PRÉ MONT.','MONT.01','ACABAMENTO','BANHO','PINTURA','ALM. FRENTE','MONT. FINAL','CARENAGEM'],status:'ESTOQUE_PA'},
+  {id:'ORD-035',cargaId:null,carga:null,op:null,produto:'10032 - ELEVAÇÃO PÉLVICA (GIII) PESO LIVRE',cor:'ONIX',dataEntrega:null,semana:'1° SEM MAIO 26',temDobra:true,temRobo:true,temCarenagem:false,setorAtual:'ESTOQUE PA',setoresConcluidos:['CORTE','DOBRA','ALM. FUNDO','ROBÔ','ACABAMENTO','BANHO','PINTURA','ALM. FRENTE','MONT. FINAL'],status:'ESTOQUE_PA'},
+  {id:'ORD-036',cargaId:null,carga:null,op:null,produto:'08231 - REMADA SENTADA OPTIMUS',cor:'PRETO FOSCO',dataEntrega:null,semana:'1° SEM MAIO 26',temDobra:true,temRobo:false,temCarenagem:false,setorAtual:'ESTOQUE PA',setoresConcluidos:['CORTE','DOBRA','ALM. FUNDO','PRÉ MONT.','MONT.01','ACABAMENTO','BANHO','PINTURA','ALM. FRENTE','MONT. FINAL'],status:'ESTOQUE_PA'},
 ];
 
 // ═══════════════════════════════════════════════════
@@ -739,69 +1158,67 @@ const ORDENS_INICIAIS = [
 // ═══════════════════════════════════════════════════
 let state = {
   usuario: null,
+  cargas: [],
   ordens: [],
   log: [],
   paginaAtual: 'dashboard',
   modalOrdemId: null,
+  modalCargaId: null,
+  pipelineFilter: { busca:'', cor:'', carga:'' },
 };
 
 function initData() {
-  const saved = localStorage.getItem('mes_ordens');
-  const savedLog = localStorage.getItem('mes_log');
-  if (saved) {
-    state.ordens = JSON.parse(saved);
+  const sCargas = localStorage.getItem('mes_cargas');
+  const sOrdens = localStorage.getItem('mes_ordens');
+  const sLog    = localStorage.getItem('mes_log');
+
+  state.cargas = sCargas ? JSON.parse(sCargas) : JSON.parse(JSON.stringify(CARGAS_INICIAIS));
+  state.ordens = sOrdens ? JSON.parse(sOrdens) : JSON.parse(JSON.stringify(ORDENS_INICIAIS));
+
+  if (sLog) {
+    state.log = JSON.parse(sLog);
   } else {
-    state.ordens = JSON.parse(JSON.stringify(ORDENS_INICIAIS));
-    saveData();
-  }
-  if (savedLog) {
-    state.log = JSON.parse(savedLog);
-  } else {
-    // Seed some log entries from BASE DE DADOS
-    const now = new Date();
-    const logs_seed = [
-      {id:1,ts:'2026-04-27T07:58:30',orderId:'ORD-017',produto:'08281 - EXTENSOR LF-R PRA',de:'LIBERADO',para:'CORTE',usuario:'producao2@grupolion.com.br'},
-      {id:2,ts:'2026-04-27T07:58:32',orderId:'ORD-017',produto:'08281 - EXTENSOR LF-R PRA',de:'CORTE',para:'DOBRA',usuario:'producao2@grupolion.com.br'},
-      {id:3,ts:'2026-04-27T07:58:50',orderId:'ORD-017',produto:'08281 - EXTENSOR LF-R PRA',de:'DOBRA',para:'ALM. FUNDO',usuario:'producao2@grupolion.com.br'},
-      {id:4,ts:'2026-04-27T07:59:04',orderId:'ORD-017',produto:'08281 - EXTENSOR LF-R PRA',de:'ALM. FUNDO',para:'PRÉ MONT.',usuario:'producao2@grupolion.com.br'},
-      {id:5,ts:'2026-04-27T07:59:07',orderId:'ORD-017',produto:'08281 - EXTENSOR LF-R PRA',de:'PRÉ MONT.',para:'MONT.01',usuario:'producao2@grupolion.com.br'},
-      {id:6,ts:'2026-04-27T07:59:11',orderId:'ORD-017',produto:'08281 - EXTENSOR LF-R PRA',de:'MONT.01',para:'ACABAMENTO',usuario:'producao2@grupolion.com.br'},
-      {id:7,ts:'2026-04-27T08:00:34',orderId:'ORD-019',produto:'10032 - ELEVAÇÃO PÉLVICA (GIII) PESO LIVRE',de:'LIBERADO',para:'CORTE',usuario:'producao2@grupolion.com.br'},
-      {id:8,ts:'2026-04-27T08:00:46',orderId:'ORD-019',produto:'10032 - ELEVAÇÃO PÉLVICA (GIII) PESO LIVRE',de:'ALM. FUNDO',para:'ROBÔ',usuario:'producao2@grupolion.com.br'},
-      {id:9,ts:'2026-04-27T13:13:59',orderId:'ORD-018',produto:'08436 - FLEXOR SENTADO PRÓ PRE',de:'ALM. FUNDO',para:'PRÉ MONT.',usuario:'pcp4@grupolion.com.br'},
+    state.log = [
+      {id:1,ts:'2026-04-26T09:00:00',orderId:null,cargaId:'CG-10470',produto:'CARGA 10470',de:'PLANEJADA',para:'LIBERADA',usuario:'pcp@lion.com'},
+      {id:2,ts:'2026-04-27T07:58:30',orderId:'ORD-003',produto:'08281 - EXTENSOR LF-R PRA',de:'CORTE',para:'DOBRA',usuario:'corte@lion.com'},
+      {id:3,ts:'2026-04-27T07:58:50',orderId:'ORD-003',produto:'08281 - EXTENSOR LF-R PRA',de:'DOBRA',para:'ALM. FUNDO',usuario:'dobra@lion.com'},
+      {id:4,ts:'2026-04-27T07:59:04',orderId:'ORD-003',produto:'08281 - EXTENSOR LF-R PRA',de:'ALM. FUNDO',para:'PRÉ MONT.',usuario:'almfundo@lion.com'},
+      {id:5,ts:'2026-04-27T07:59:11',orderId:'ORD-003',produto:'08281 - EXTENSOR LF-R PRA',de:'PRÉ MONT.',para:'MONT.01',usuario:'premontagem@lion.com'},
+      {id:6,ts:'2026-04-27T08:00:34',orderId:'ORD-025',produto:'10032 - ELEVAÇÃO PÉLVICA (GIII) PESO LIVRE',de:'ALM. FUNDO',para:'ROBÔ',usuario:'almfundo@lion.com'},
     ];
-    state.log = logs_seed;
     saveLog();
   }
+  saveCargas(); saveData();
 }
 
-function saveData() {
-  localStorage.setItem('mes_ordens', JSON.stringify(state.ordens));
-}
-function saveLog() {
-  localStorage.setItem('mes_log', JSON.stringify(state.log));
-}
+function saveCargas() { localStorage.setItem('mes_cargas', JSON.stringify(state.cargas)); }
+function saveData()   { localStorage.setItem('mes_ordens', JSON.stringify(state.ordens)); }
+function saveLog()    { localStorage.setItem('mes_log', JSON.stringify(state.log)); }
 
 // ═══════════════════════════════════════════════════
 //  FLOW LOGIC
 // ═══════════════════════════════════════════════════
 function proximoSetor(ordem) {
   switch(ordem.setorAtual) {
-    case 'NAO_LIBERADO': return 'CORTE';
-    case 'CORTE': return ordem.temDobra ? 'DOBRA' : 'ALM. FUNDO';
-    case 'DOBRA': return 'ALM. FUNDO';
-    case 'ALM. FUNDO': return ordem.temRobo ? 'ROBÔ' : 'PRÉ MONT.';
-    case 'ROBÔ': return 'ACABAMENTO';
-    case 'PRÉ MONT.': return 'MONT.01';
-    case 'MONT.01': return 'ACABAMENTO';
-    case 'ACABAMENTO': return 'BANHO';
-    case 'BANHO': return 'PINTURA';
-    case 'PINTURA': return 'ALM. FRENTE';
-    case 'ALM. FRENTE': return 'MONT. FINAL';
-    case 'MONT. FINAL': return ordem.temCarenagem ? 'CARENAGEM' : 'QUALIDADE';
-    case 'CARENAGEM': return 'QUALIDADE';
-    case 'QUALIDADE': return 'EXPEDIÇÃO';
-    case 'ESTOQUE BANHO': return 'PINTURA';
+    case 'PLANEJADA':    return 'CORTE';
+    case 'CORTE':        return ordem.temDobra ? 'DOBRA' : 'ALM. FUNDO';
+    case 'DOBRA':        return 'ALM. FUNDO';
+    case 'ALM. FUNDO':   return ordem.temRobo ? 'ROBÔ' : 'PRÉ MONT.';
+    case 'ROBÔ':         return 'ACABAMENTO';
+    case 'PRÉ MONT.':    return 'MONT.01';
+    case 'MONT.01':      return 'ACABAMENTO';
+    case 'ACABAMENTO':   return 'BANHO';
+    case 'BANHO':        return 'PINTURA';
+    case 'PINTURA':      return 'ALM. FRENTE';
+    case 'ALM. FRENTE':  return 'MONT. FINAL';
+    case 'MONT. FINAL':
+      // Se foi reprovado em montagem (pulaCarenagem) → vai direto pra qualidade
+      if (ordem.pulaCarenagem) return 'QUALIDADE';
+      return ordem.temCarenagem ? 'CARENAGEM' : 'QUALIDADE';
+    case 'CARENAGEM':    return 'QUALIDADE';
+    case 'QUALIDADE':    return 'EXPEDIÇÃO';
+    case 'ESTOQUE BANHO':return 'BANHO';
+    case 'ESTOQUE PA':   return 'QUALIDADE';
     default: return null;
   }
 }
@@ -816,7 +1233,7 @@ function getFlowSteps(ordem) {
     steps.push('PRÉ MONT.', 'MONT.01');
   }
   steps.push('ACABAMENTO','BANHO','PINTURA','ALM. FRENTE','MONT. FINAL');
-  if (ordem.temCarenagem) steps.push('CARENAGEM');
+  if (ordem.temCarenagem && !ordem.pulaCarenagem) steps.push('CARENAGEM');
   steps.push('QUALIDADE','EXPEDIÇÃO');
   return steps;
 }
@@ -830,7 +1247,8 @@ function getSetorBadgeClass(setor) {
     'ACABAMENTO':'setor-ACAB','BANHO':'setor-BANHO',
     'PINTURA':'setor-PINTURA','CARENAGEM':'setor-CARENAGEM',
     'QUALIDADE':'setor-QUALIDADE','EXPEDIÇÃO':'setor-EXPEDICAO',
-    'ESTOQUE BANHO':'setor-ESTOQUE','NAO_LIBERADO':'badge-gray'
+    'ESTOQUE BANHO':'setor-ESTOQUE','ESTOQUE PA':'setor-ESTOQUE',
+    'PLANEJADA':'badge-gray'
   };
   return map[setor] || 'badge-setor';
 }
@@ -849,10 +1267,7 @@ function doLogin() {
   const pass = document.getElementById('login-pass').value;
   const user = USUARIOS.find(u => u.id === uid);
   const err = document.getElementById('login-error');
-  if (!user || user.senha !== pass) {
-    err.style.display = 'block';
-    return;
-  }
+  if (!user || user.senha !== pass) { err.style.display = 'block'; return; }
   err.style.display = 'none';
   state.usuario = user;
   document.getElementById('login-screen').style.display = 'none';
@@ -889,11 +1304,18 @@ function buildNav() {
   if (u.perfil === 'pcp' || u.perfil === 'admin') {
     html += `<div class="nav-section-title">Visão Geral</div>`;
     html += navItem('dashboard','📊','Dashboard');
-    html += navItem('todas-ordens','📋','Todas as Ordens');
     html += navItem('pipeline','🔄','Pipeline de Produção');
-    html += `<div class="nav-section-title">Gestão</div>`;
-    html += navItem('nova-ordem','➕','Nova Ordem');
+    html += navItem('todas-ordens','📋','Todas as Máquinas');
+
+    html += `<div class="nav-section-title">Planejamento (PCP)</div>`;
+    html += navItem('cargas','📦','Cargas');
+    html += navItem('producao-estoque','🏭','Produção para Estoque');
+
+    html += `<div class="nav-section-title">Estoques</div>`;
     html += navItem('estoque-banho','💧','Estoque Banho');
+    html += navItem('estoque-pa','🏷','Estoque Produto Acabado');
+
+    html += `<div class="nav-section-title">Sistema</div>`;
     html += navItem('log','📜','Rastreabilidade');
   }
   if (u.perfil === 'admin') {
@@ -909,7 +1331,7 @@ function buildNav() {
   if (u.perfil === 'qualidade') {
     html += `<div class="nav-section-title">Qualidade</div>`;
     html += navItem('qualidade','✅','Inspeção de Qualidade');
-    html += navItem('aprovados','📦','Aprovados');
+    html += navItem('aprovados','📦','Avaliadas');
     html += navItem('log','📜','Histórico');
   }
   nav.innerHTML = html;
@@ -929,6 +1351,7 @@ function navTo(page) {
   document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
   const navEl = document.getElementById(`nav-${page}`);
   if (navEl) navEl.classList.add('active');
+  closeMobileSidebar();
   renderPage(page);
 }
 
@@ -941,20 +1364,24 @@ function renderPage(page) {
   const topSub = document.getElementById('topbar-subtitle');
   const topActions = document.getElementById('topbar-actions');
   topActions.innerHTML = '';
+  content.scrollTop = 0;
 
   switch(page) {
-    case 'dashboard': renderDashboard(content, topTitle, topSub, topActions); break;
-    case 'todas-ordens': renderTodasOrdens(content, topTitle, topSub, topActions); break;
-    case 'pipeline': renderPipeline(content, topTitle, topSub, topActions); break;
-    case 'meu-setor': renderMeuSetor(content, topTitle, topSub, topActions); break;
-    case 'qualidade': renderQualidade(content, topTitle, topSub, topActions); break;
-    case 'aprovados': renderAprovados(content, topTitle, topSub, topActions); break;
-    case 'estoque-banho': renderEstoqueBanho(content, topTitle, topSub, topActions); break;
-    case 'log': renderLog(content, topTitle, topSub, topActions); break;
-    case 'usuarios': renderUsuarios(content, topTitle, topSub, topActions); break;
-    case 'nova-ordem': openNovaOrdem(); break;
-    case 'reset': resetDados(); break;
-    default: renderDashboard(content, topTitle, topSub, topActions);
+    case 'dashboard':         renderDashboard(content, topTitle, topSub, topActions); break;
+    case 'todas-ordens':      renderTodasOrdens(content, topTitle, topSub, topActions); break;
+    case 'pipeline':          renderPipeline(content, topTitle, topSub, topActions); break;
+    case 'cargas':            renderCargas(content, topTitle, topSub, topActions); break;
+    case 'carga-detalhe':     renderCargaDetalhe(content, topTitle, topSub, topActions); break;
+    case 'producao-estoque':  renderProducaoEstoque(content, topTitle, topSub, topActions); break;
+    case 'estoque-banho':     renderEstoqueBanho(content, topTitle, topSub, topActions); break;
+    case 'estoque-pa':        renderEstoquePA(content, topTitle, topSub, topActions); break;
+    case 'meu-setor':         renderMeuSetor(content, topTitle, topSub, topActions); break;
+    case 'qualidade':         renderQualidade(content, topTitle, topSub, topActions); break;
+    case 'aprovados':         renderAprovados(content, topTitle, topSub, topActions); break;
+    case 'log':               renderLog(content, topTitle, topSub, topActions); break;
+    case 'usuarios':          renderUsuarios(content, topTitle, topSub, topActions); break;
+    case 'reset':             resetDados(); break;
+    default:                  renderDashboard(content, topTitle, topSub, topActions);
   }
 }
 
@@ -963,51 +1390,53 @@ function renderPage(page) {
 // ═══════════════════════════════════════════════════
 function renderDashboard(el, topTitle, topSub, topActions) {
   topTitle.textContent = 'Dashboard de Produção';
-  topSub.textContent = `Semana 1° SEM MAIO 26 · ${new Date().toLocaleDateString('pt-BR')}`;
+  topSub.textContent = `${new Date().toLocaleDateString('pt-BR')} · ${state.cargas.length} carga(s) cadastrada(s)`;
   if (state.usuario.perfil === 'pcp' || state.usuario.perfil === 'admin') {
-    topActions.innerHTML = `<button class="btn-sm btn-amber" onclick="openNovaOrdemModal()">➕ Nova Ordem</button>`;
+    topActions.innerHTML = `
+      <button class="btn-sm btn-amber" onclick="openNovaCarga()">➕ Nova Carga</button>
+      <button class="btn-sm btn-outline" onclick="openProdEstoque()">🏭 Prod. Estoque</button>`;
   }
 
   const ordens = state.ordens;
   const em_prod = ordens.filter(o => o.status === 'EM_PRODUCAO').length;
-  const nao_lib = ordens.filter(o => o.status === 'NAO_LIBERADO').length;
+  const planejada = ordens.filter(o => o.status === 'PLANEJADA').length;
   const expedido = ordens.filter(o => o.status === 'EXPEDIDO').length;
   const aprovado = ordens.filter(o => o.status === 'APROVADO').length;
   const reprovado = ordens.filter(o => o.status === 'REPROVADO').length;
   const est_banho = ordens.filter(o => o.status === 'ESTOQUE_BANHO').length;
-  const qualidade = ordens.filter(o => o.setorAtual === 'QUALIDADE').length;
+  const est_pa = ordens.filter(o => o.status === 'ESTOQUE_PA').length;
+  const qualidade = ordens.filter(o => o.setorAtual === 'QUALIDADE' && o.status === 'EM_PRODUCAO').length;
+  const cargas_planej = state.cargas.filter(c => c.status === 'PLANEJADA').length;
+  const cargas_lib = state.cargas.filter(c => c.status === 'LIBERADA').length;
 
-  // By setor
   const setor_counts = {};
-  SETORES_FLOW.forEach(s => {
-    setor_counts[s] = ordens.filter(o => o.setorAtual === s).length;
-  });
+  SETORES_FLOW.forEach(s => { setor_counts[s] = ordens.filter(o => o.setorAtual === s && o.status === 'EM_PRODUCAO').length; });
 
   el.innerHTML = `
   <div class="kpi-grid">
-    <div class="kpi-card amber"><div class="kpi-label">Em Produção</div><div class="kpi-value">${em_prod}</div><div class="kpi-sub">ordens ativas</div></div>
-    <div class="kpi-card gray" style="--gray:#64748b"><div class="kpi-label" style="--c:var(--text3)">Não Liberado</div><div class="kpi-value" style="color:var(--text3)">${nao_lib}</div><div class="kpi-sub">aguardando PCP</div></div>
-    <div class="kpi-card blue"><div class="kpi-label">Estoque Banho</div><div class="kpi-value">${est_banho}</div><div class="kpi-sub">prontos para pintura</div></div>
-    <div class="kpi-card teal"><div class="kpi-label">Em Qualidade</div><div class="kpi-value">${qualidade}</div><div class="kpi-sub">aguardando inspeção</div></div>
+    <div class="kpi-card amber"><div class="kpi-label">Em Produção</div><div class="kpi-value">${em_prod}</div><div class="kpi-sub">máquinas ativas</div></div>
+    <div class="kpi-card violet"><div class="kpi-label">Cargas Planejadas</div><div class="kpi-value">${cargas_planej}</div><div class="kpi-sub">aguardando liberação</div></div>
+    <div class="kpi-card green"><div class="kpi-label">Cargas Liberadas</div><div class="kpi-value">${cargas_lib}</div><div class="kpi-sub">em produção</div></div>
+    <div class="kpi-card blue"><div class="kpi-label">Estoque Banho</div><div class="kpi-value">${est_banho}</div><div class="kpi-sub">disponíveis</div></div>
+    <div class="kpi-card teal"><div class="kpi-label">Estoque PA</div><div class="kpi-value">${est_pa}</div><div class="kpi-sub">prod. acabado</div></div>
+    <div class="kpi-card amber"><div class="kpi-label">Em Qualidade</div><div class="kpi-value">${qualidade}</div><div class="kpi-sub">aguardando inspeção</div></div>
     <div class="kpi-card green"><div class="kpi-label">Aprovados/Expedidos</div><div class="kpi-value">${aprovado + expedido}</div><div class="kpi-sub">concluídos</div></div>
-    ${reprovado > 0 ? `<div class="kpi-card red"><div class="kpi-label">Reprovados</div><div class="kpi-value">${reprovado}</div><div class="kpi-sub">necessitam revisão</div></div>` : ''}
+    ${reprovado > 0 ? `<div class="kpi-card red"><div class="kpi-label">Reprovados</div><div class="kpi-value">${reprovado}</div><div class="kpi-sub">necessitam ação</div></div>` : ''}
   </div>
 
   <div class="section-header" style="margin-bottom:12px">
-    <div class="section-title">Distribuição por Setor</div>
+    <div class="section-title">Distribuição por Setor (somente máquinas em produção)</div>
   </div>
   <div class="table-wrap" style="margin-bottom:24px">
     <div class="table-scroll-wrap">
     <table>
       <thead><tr>
         ${SETORES_FLOW.map(s => `<th>${SETOR_ICON[s]||''} ${s}</th>`).join('')}
-        <th>EST. BANHO</th>
       </tr></thead>
       <tbody><tr>
         ${SETORES_FLOW.map(s => `<td style="text-align:center">
           <span class="kpi-value" style="font-size:22px;color:${setor_counts[s]>0?'var(--amber)':'var(--text3)'}">${setor_counts[s]}</span>
         </td>`).join('')}
-        <td style="text-align:center"><span class="kpi-value" style="font-size:22px;color:${est_banho>0?'var(--blue)':'var(--text3)'}">${est_banho}</span></td>
       </tr></tbody>
     </table>
     </div>
@@ -1019,16 +1448,16 @@ function renderDashboard(el, topTitle, topSub, topActions) {
   <div class="table-wrap">
     <table>
       <thead><tr>
-        <th>Data/Hora</th><th>Ordem</th><th>Produto</th><th>De</th><th>Para</th><th>Usuário</th>
+        <th>Data/Hora</th><th>Ordem/Carga</th><th>Produto</th><th>De</th><th>Para</th><th>Usuário</th>
       </tr></thead>
       <tbody>
         ${state.log.slice().reverse().slice(0,10).map(l => `
         <tr>
           <td class="log-time">${formatTs(l.ts)}</td>
-          <td class="td-mono">${l.orderId}</td>
-          <td style="max-width:220px;font-size:13px">${l.produto}</td>
+          <td class="td-mono">${l.orderId || l.cargaId || '—'}</td>
+          <td style="max-width:240px;font-size:13px">${l.produto || '—'}</td>
           <td><span class="badge ${getSetorBadgeClass(l.de)}">${l.de||'—'}</span></td>
-          <td><span class="badge ${getSetorBadgeClass(l.para)}">${l.para}</span></td>
+          <td><span class="badge ${getSetorBadgeClass(l.para)}">${l.para||'—'}</span></td>
           <td style="font-size:12px;color:var(--text3)">${l.usuario}</td>
         </tr>`).join('') || '<tr><td colspan="6" style="text-align:center;padding:24px;color:var(--text3)">Nenhum registro</td></tr>'}
       </tbody>
@@ -1038,31 +1467,32 @@ function renderDashboard(el, topTitle, topSub, topActions) {
 }
 
 // ═══════════════════════════════════════════════════
-//  TODAS ORDENS
+//  TODAS AS MÁQUINAS
 // ═══════════════════════════════════════════════════
 function renderTodasOrdens(el, topTitle, topSub, topActions) {
-  topTitle.textContent = 'Todas as Ordens';
-  topSub.textContent = `${state.ordens.length} ordens cadastradas`;
-  topActions.innerHTML = `<button class="btn-sm btn-amber" onclick="openNovaOrdemModal()">➕ Nova Ordem</button>`;
-  el.innerHTML = renderOrdensTable(state.ordens, true);
+  topTitle.textContent = 'Todas as Máquinas';
+  topSub.textContent = `${state.ordens.length} máquinas cadastradas (incluindo estoques)`;
+  el.innerHTML = renderOrdensTable(state.ordens);
 }
 
-function renderOrdensTable(ordens, showActions=true) {
+function renderOrdensTable(ordens) {
   return `
   <div class="table-wrap">
     <div class="table-filters">
-      <input type="text" class="filter-input" placeholder="🔍 Buscar produto, OP, carga..." oninput="filtrarOrdens(this.value)">
+      <input type="text" class="filter-input" placeholder="🔍 Buscar produto, OP, carga, ID..." oninput="filtrarOrdens(this.value)">
       <select class="filter-select" onchange="filtrarSetor(this.value)">
         <option value="">Todos os Setores</option>
         ${SETORES_FLOW.map(s => `<option value="${s}">${SETOR_ICON[s]} ${s}</option>`).join('')}
         <option value="ESTOQUE BANHO">💧 Estoque Banho</option>
-        <option value="NAO_LIBERADO">📋 Não Liberado</option>
+        <option value="ESTOQUE PA">🏷 Estoque PA</option>
+        <option value="PLANEJADA">📋 Planejada</option>
       </select>
       <select class="filter-select" onchange="filtrarStatus(this.value)">
         <option value="">Todos Status</option>
         <option value="EM_PRODUCAO">Em Produção</option>
-        <option value="NAO_LIBERADO">Não Liberado</option>
+        <option value="PLANEJADA">Planejada</option>
         <option value="ESTOQUE_BANHO">Estoque Banho</option>
+        <option value="ESTOQUE_PA">Estoque PA</option>
         <option value="APROVADO">Aprovado</option>
         <option value="REPROVADO">Reprovado</option>
         <option value="EXPEDIDO">Expedido</option>
@@ -1072,44 +1502,39 @@ function renderOrdensTable(ordens, showActions=true) {
     <table id="main-table">
       <thead><tr>
         <th>ID</th><th>Carga</th><th>OP</th><th>Produto</th><th>Cor</th>
-        <th>Entrega</th><th>Setor Atual</th><th>Progresso</th>${showActions?'<th>Ações</th>':''}
+        <th>Entrega</th><th>Setor / Status</th><th>Progresso</th><th>Ações</th>
       </tr></thead>
       <tbody id="main-tbody">
-        ${renderOrdensRows(ordens, showActions)}
+        ${renderOrdensRows(ordens)}
       </tbody>
     </table>
     </div>
   </div>`;
 }
 
-function renderOrdensRows(ordens, showActions=true) {
-  if (!ordens.length) return `<tr><td colspan="9" style="text-align:center;padding:32px;color:var(--text3)">Nenhuma ordem encontrada</td></tr>`;
+function renderOrdensRows(ordens) {
+  if (!ordens.length) return `<tr><td colspan="9" style="text-align:center;padding:32px;color:var(--text3)">Nenhuma máquina encontrada</td></tr>`;
   return ordens.map(o => {
     const steps = getFlowSteps(o);
     const doneCount = o.setoresConcluidos ? o.setoresConcluidos.length : 0;
     const totalSteps = steps.length;
     const pct = Math.round((doneCount / totalSteps) * 100);
-    const flowBar = steps.map((s, i) => {
+    const flowBar = steps.map((s) => {
       const cls = o.setoresConcluidos && o.setoresConcluidos.includes(s) ? 'done' : (s === o.setorAtual ? 'current' : '');
       return `<div class="flow-step ${cls}" title="${s}"></div>`;
     }).join('');
 
-    const statusBadge = o.status === 'NAO_LIBERADO' ? `<span class="badge badge-gray">Não Liberado</span>` :
-      o.status === 'ESTOQUE_BANHO' ? `<span class="badge badge-teal">Estoque Banho</span>` :
-      o.status === 'APROVADO' ? `<span class="badge badge-green">Aprovado</span>` :
-      o.status === 'REPROVADO' ? `<span class="badge badge-red">Reprovado</span>` :
-      o.status === 'EXPEDIDO' ? `<span class="badge badge-amber">Expedido</span>` :
+    const statusBadge = o.status === 'PLANEJADA' ? `<span class="badge status-PLANEJADA">📋 Planejada</span>` :
+      o.status === 'ESTOQUE_BANHO' ? `<span class="badge badge-stock">💧 Estoque Banho</span>` :
+      o.status === 'ESTOQUE_PA' ? `<span class="badge badge-stock">🏷 Estoque PA</span>` :
+      o.status === 'APROVADO' ? `<span class="badge badge-green">✓ Aprovado</span>` :
+      o.status === 'REPROVADO' ? `<span class="badge badge-red">✗ Reprovado</span>` :
+      o.status === 'EXPEDIDO' ? `<span class="badge badge-amber">🚚 Expedido</span>` :
       `<span class="badge ${getSetorBadgeClass(o.setorAtual)}">${SETOR_ICON[o.setorAtual]||''} ${o.setorAtual}</span>`;
-
-    const actions = showActions ? `<td class="td-actions">
-      <button class="btn-sm btn-outline" onclick="verDetalhes('${o.id}')" style="padding:5px 10px;font-size:12px">📜 Ver</button>
-      ${(state.usuario.perfil==='pcp'||state.usuario.perfil==='admin') && o.status==='NAO_LIBERADO' ?
-        `<button class="btn-sm btn-amber" onclick="liberarOrdem('${o.id}')" style="padding:5px 10px;font-size:12px">▶ Liberar</button>` : ''}
-    </td>` : '';
 
     return `<tr>
       <td class="td-mono" style="font-size:12px;color:var(--text3)">${o.id}</td>
-      <td class="td-mono">${o.carga||'—'}</td>
+      <td class="td-mono">${o.carga||(o.producaoEstoque?'<span class="badge badge-prod-estoque" style="font-size:9px">PROD. ESTOQUE</span>':'—')}</td>
       <td class="td-mono">${o.op||'—'}</td>
       <td class="td-product" style="max-width:220px;font-size:13px">${o.produto}</td>
       <td><span style="font-size:12px;color:var(--text3)">${o.cor||'—'}</span></td>
@@ -1119,34 +1544,585 @@ function renderOrdensRows(ordens, showActions=true) {
         <div class="flow-bar" style="margin-bottom:3px">${flowBar}</div>
         <span style="font-size:10px;color:var(--text3);font-family:'JetBrains Mono',monospace">${doneCount}/${totalSteps} · ${pct}%</span>
       </td>
-      ${actions}
+      <td class="td-actions">
+        <button class="btn-sm btn-outline" onclick="verDetalhes('${o.id}')" style="padding:5px 10px;font-size:12px">📜 Ver</button>
+      </td>
     </tr>`;
   }).join('');
 }
 
 let filtros = { busca: '', setor: '', status: '' };
-function filtrarOrdens(v) { filtros.busca = v.toLowerCase(); applyFilters(); }
-function filtrarSetor(v) { filtros.setor = v; applyFilters(); }
-function filtrarStatus(v) { filtros.status = v; applyFilters(); }
-function applyFilters() {
+function filtrarOrdens(v) { filtros.busca = v.toLowerCase(); applyFiltrosOrdens(); }
+function filtrarSetor(v) { filtros.setor = v; applyFiltrosOrdens(); }
+function filtrarStatus(v) { filtros.status = v; applyFiltrosOrdens(); }
+function applyFiltrosOrdens() {
   let filtered = state.ordens.filter(o => {
     const matchBusca = !filtros.busca || o.produto.toLowerCase().includes(filtros.busca) ||
-      String(o.op||'').includes(filtros.busca) || String(o.carga||'').includes(filtros.busca) || o.id.toLowerCase().includes(filtros.busca);
+      String(o.op||'').toLowerCase().includes(filtros.busca) || String(o.carga||'').includes(filtros.busca) || o.id.toLowerCase().includes(filtros.busca);
     const matchSetor = !filtros.setor || o.setorAtual === filtros.setor;
     const matchStatus = !filtros.status || o.status === filtros.status;
     return matchBusca && matchSetor && matchStatus;
   });
   const tbody = document.getElementById('main-tbody');
-  if (tbody) tbody.innerHTML = renderOrdensRows(filtered, true);
+  if (tbody) tbody.innerHTML = renderOrdensRows(filtered);
 }
 
 // ═══════════════════════════════════════════════════
-//  MEU SETOR (producao)
+//  CARGAS — listagem + criação
+// ═══════════════════════════════════════════════════
+function renderCargas(el, topTitle, topSub, topActions) {
+  topTitle.textContent = '📦 Cargas (Romaneios)';
+  topSub.textContent = `${state.cargas.length} carga(s) · ${state.cargas.filter(c=>c.status==='PLANEJADA').length} planejada(s) · ${state.cargas.filter(c=>c.status==='LIBERADA').length} liberada(s)`;
+  topActions.innerHTML = `<button class="btn-sm btn-amber" onclick="openNovaCarga()">➕ Nova Carga</button>`;
+
+  const planejadas = state.cargas.filter(c => c.status === 'PLANEJADA');
+  const liberadas  = state.cargas.filter(c => c.status === 'LIBERADA');
+
+  el.innerHTML = `
+    ${renderCargasGroup('📋 Planejadas (não estão na produção)', planejadas, 'planned')}
+    ${renderCargasGroup('✓ Liberadas (em produção)', liberadas, 'released')}
+    ${state.cargas.length === 0 ? `<div class="empty-state"><div class="empty-icon">📦</div><div class="empty-title">Nenhuma carga cadastrada</div><div class="empty-sub">Crie a primeira carga para começar a planejar.</div></div>` : ''}
+  `;
+}
+
+function renderCargasGroup(titulo, cargas, classe) {
+  if (!cargas.length) return '';
+  return `
+    <div class="section-header" style="margin-top:24px;margin-bottom:14px">
+      <div class="section-title">${titulo} <span class="section-count">${cargas.length}</span></div>
+    </div>
+    ${cargas.map(c => renderCargaCard(c, classe)).join('')}
+  `;
+}
+
+function renderCargaCard(c, classe) {
+  const maquinas = state.ordens.filter(o => o.cargaId === c.id);
+  const isPCP = state.usuario && (state.usuario.perfil === 'pcp' || state.usuario.perfil === 'admin');
+  const podeRelease = c.status === 'PLANEJADA' && maquinas.length > 0 && isPCP;
+  return `
+    <div class="carga-card ${classe}">
+      <div class="carga-card-top">
+        <div>
+          <div class="carga-card-num">CARGA ${c.numero}</div>
+          <div class="carga-card-meta">
+            ${c.semana} · ${maquinas.length} máquina(s) ·
+            criada em ${formatTs(c.dataCriacao)}
+            ${c.dataLiberacao ? ` · liberada em ${formatTs(c.dataLiberacao)}` : ''}
+          </div>
+        </div>
+        <div class="carga-card-actions">
+          <span class="badge status-${c.status}" style="font-size:11px;padding:5px 12px">${c.status === 'PLANEJADA' ? '📋 Planejada' : '✓ Liberada'}</span>
+          ${c.status === 'PLANEJADA' && isPCP ? `<button class="btn-sm btn-outline" onclick="openAddMaquina('${c.id}')" style="font-size:12px;padding:5px 12px">➕ Adicionar Máquina</button>` : ''}
+          ${podeRelease ? `<button class="btn-sm btn-green" onclick="liberarCarga('${c.id}')" style="font-size:12px;padding:5px 14px">▶ Liberar Carga</button>` : ''}
+          <button class="btn-sm btn-outline" onclick="abrirCargaDetalhe('${c.id}')" style="font-size:12px;padding:5px 12px">🔍 Detalhes</button>
+        </div>
+      </div>
+      ${maquinas.length === 0
+        ? `<div class="empty-mini">Nenhuma máquina nesta carga ainda. Adicione antes de liberar.</div>`
+        : `<div class="carga-machines-list">${maquinas.map(m => renderMachineRow(m, c.status === 'PLANEJADA' && isPCP)).join('')}</div>`}
+    </div>
+  `;
+}
+
+function renderMachineRow(m, podeRemover) {
+  const origem = m.origemEstoque ? `<span class="src-tag src-ESTOQUE_${m.origemEstoque}">DE ESTOQUE ${m.origemEstoque}</span>` : `<span class="src-tag src-NOVA">NOVA</span>`;
+  const attrs = `
+    ${m.temDobra ? '<span class="badge badge-amber" style="font-size:9px">DOBRA</span>' : ''}
+    ${m.temRobo ? '<span class="badge badge-violet" style="font-size:9px">ROBÔ</span>' : ''}
+    ${m.temCarenagem ? '<span class="badge badge-amber" style="font-size:9px">CARENAGEM</span>' : ''}
+  `;
+  return `
+    <div class="carga-machine-row">
+      <div>
+        <div style="font-weight:600;font-size:13px">${m.produto}</div>
+        <div style="font-size:11px;color:var(--text3);font-family:'JetBrains Mono',monospace;margin-top:2px">OP ${m.op||'S/N'} · ${m.id}</div>
+      </div>
+      <div style="font-size:12px;color:var(--text3)">${m.cor||'—'}</div>
+      <div>${origem}</div>
+      <div style="display:flex;gap:3px;flex-wrap:wrap">${attrs}</div>
+      <div>
+        ${m.status === 'PLANEJADA' && podeRemover
+          ? `<button class="btn-icon-mini" onclick="removerMaquinaCarga('${m.id}')" title="Remover">🗑</button>`
+          : `<span class="badge ${getSetorBadgeClass(m.setorAtual)}" style="font-size:10px">${m.setorAtual}</span>`}
+      </div>
+    </div>
+  `;
+}
+
+function abrirCargaDetalhe(cargaId) {
+  state.modalCargaId = cargaId;
+  navTo('carga-detalhe');
+}
+
+function renderCargaDetalhe(el, topTitle, topSub, topActions) {
+  const c = state.cargas.find(x => x.id === state.modalCargaId);
+  if (!c) { navTo('cargas'); return; }
+  const maquinas = state.ordens.filter(o => o.cargaId === c.id);
+  topTitle.textContent = `📦 Carga ${c.numero}`;
+  topSub.textContent = `${c.semana} · ${maquinas.length} máquina(s) · ${c.status}`;
+  topActions.innerHTML = `<button class="btn-sm btn-outline" onclick="navTo('cargas')">← Voltar</button>`;
+
+  el.innerHTML = `
+    <div class="modal-info-grid" style="margin-bottom:20px">
+      <div class="modal-info-item"><div class="modal-info-label">Número</div><div class="modal-info-value">${c.numero}</div></div>
+      <div class="modal-info-item"><div class="modal-info-label">Semana</div><div class="modal-info-value">${c.semana}</div></div>
+      <div class="modal-info-item"><div class="modal-info-label">Status</div><div class="modal-info-value"><span class="badge status-${c.status}">${c.status}</span></div></div>
+      <div class="modal-info-item"><div class="modal-info-label">Criada</div><div class="modal-info-value">${formatTs(c.dataCriacao)}</div></div>
+      <div class="modal-info-item"><div class="modal-info-label">Liberada</div><div class="modal-info-value">${c.dataLiberacao ? formatTs(c.dataLiberacao) : '—'}</div></div>
+      <div class="modal-info-item"><div class="modal-info-label">Total Máquinas</div><div class="modal-info-value">${maquinas.length}</div></div>
+    </div>
+    ${renderCargaCard(c, c.status==='PLANEJADA'?'planned':'released')}
+  `;
+}
+
+// ── Nova Carga ────────────────────────────
+function openNovaCarga() {
+  document.getElementById('nc-numero').value = '';
+  document.getElementById('nc-semana').value = '1° SEM MAIO 26';
+  document.getElementById('modal-nova-carga').classList.add('open');
+}
+
+function salvarNovaCarga() {
+  const numero = document.getElementById('nc-numero').value.trim();
+  const semana = document.getElementById('nc-semana').value.trim();
+  if (!numero) { showToast('Informe o número da carga!', 'error'); return; }
+  if (!semana) { showToast('Informe a semana!', 'error'); return; }
+  if (state.cargas.some(c => c.numero === numero)) { showToast('Já existe uma carga com esse número!', 'error'); return; }
+  const c = {
+    id: 'CG-' + numero,
+    numero, semana,
+    status: 'PLANEJADA',
+    dataCriacao: new Date().toISOString(),
+    dataLiberacao: null,
+  };
+  state.cargas.push(c);
+  saveCargas();
+  addLog(null, c.id, `CARGA ${c.numero}`, null, null, 'PLANEJADA', 'CARGA CRIADA');
+  closeModal('modal-nova-carga');
+  showToast(`✓ Carga ${numero} criada — adicione as máquinas`, 'success');
+  state.modalCargaId = c.id;
+  navTo('carga-detalhe');
+}
+
+// ── Adicionar Máquina à Carga ─────────────
+function openAddMaquina(cargaId) {
+  state.modalCargaId = cargaId;
+  const c = state.cargas.find(x => x.id === cargaId);
+  if (!c) return;
+  document.getElementById('mam-sub').textContent = `Carga ${c.numero} · ${c.semana}`;
+  const body = document.getElementById('mam-body');
+  body.innerHTML = `
+    <div class="form-section">
+      <div class="form-section-title">Identificação da Máquina</div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label">Produto / Máquina *</label>
+          <select class="form-select" id="mam-produto" onchange="mam_onProdutoChange()">
+            <option value="">— selecione —</option>
+            ${PRODUTOS_CATALOGO.map(p => `<option value="${p.codigo}">${p.codigo} - ${p.nome}</option>`).join('')}
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Cor *</label>
+          <input type="text" class="form-input" id="mam-cor" placeholder="Ex: PRETO FOSCO" oninput="mam_atualizarStock()">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Ordem de Produção (OP) *</label>
+          <input type="text" class="form-input" id="mam-op" placeholder="Ex: 386254">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Data de Entrega</label>
+          <input type="date" class="form-input" id="mam-data">
+        </div>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <div class="form-section-title">Atributos de Fluxo (por unidade)</div>
+      <div class="form-check-grid">
+        <div class="form-check-item"><input type="checkbox" id="mam-dobra"><label for="mam-dobra">🔧 Passa por Dobra</label></div>
+        <div class="form-check-item"><input type="checkbox" id="mam-robo"><label for="mam-robo">🤖 Vai pro Robô</label></div>
+        <div class="form-check-item"><input type="checkbox" id="mam-carenagem"><label for="mam-carenagem">🛡 Tem Carenagem</label></div>
+      </div>
+    </div>
+
+    <div id="mam-stock-area"></div>
+
+    <input type="hidden" id="mam-source" value="NOVA">
+    <input type="hidden" id="mam-source-id" value="">
+  `;
+  document.getElementById('mam-save-btn').textContent = '➕ Adicionar Máquina';
+  document.getElementById('modal-add-maquina').classList.add('open');
+}
+
+function mam_onProdutoChange() {
+  const codigo = document.getElementById('mam-produto').value;
+  if (!codigo) return;
+  const p = PRODUTOS_CATALOGO.find(x => x.codigo === codigo);
+  if (!p) return;
+  document.getElementById('mam-dobra').checked = p.temDobra;
+  document.getElementById('mam-robo').checked = p.temRobo;
+  document.getElementById('mam-carenagem').checked = p.temCarenagem;
+  mam_atualizarStock();
+}
+
+function mam_atualizarStock() {
+  const codigo = document.getElementById('mam-produto').value;
+  const cor = (document.getElementById('mam-cor').value||'').trim().toUpperCase();
+  const area = document.getElementById('mam-stock-area');
+  if (!codigo) { area.innerHTML = ''; return; }
+  const p = PRODUTOS_CATALOGO.find(x => x.codigo === codigo);
+  const prodPrefix = p ? `${p.codigo} - ${p.nome}` : '';
+
+  // Estoque Banho: bate por produto (qualquer cor — ainda não tem cor)
+  const banho = state.ordens.filter(o => o.status === 'ESTOQUE_BANHO' && o.produto.startsWith(p.codigo));
+  // Estoque PA: precisa bater produto E cor
+  const pa = cor ? state.ordens.filter(o => o.status === 'ESTOQUE_PA' && o.produto.startsWith(p.codigo) && (o.cor||'').toUpperCase() === cor) : [];
+
+  if (banho.length === 0 && pa.length === 0) {
+    area.innerHTML = `<div style="margin:8px 0;padding:10px 14px;font-size:12px;color:var(--text3);background:var(--surface);border:1px dashed var(--border);border-radius:6px">Nenhum item correspondente em estoque. A máquina iniciará em CORTE quando a carga for liberada.</div>`;
+    document.getElementById('mam-source').value = 'NOVA';
+    document.getElementById('mam-source-id').value = '';
+    return;
+  }
+
+  let html = `<div class="form-section">
+    <div class="form-section-title" style="color:var(--teal)">⚡ Itens disponíveis em Estoque</div>
+    <div style="font-size:12px;color:var(--text2);margin-bottom:12px">Você pode <b>puxar uma unidade do estoque</b> em vez de produzir do zero — ela será descontada automaticamente ao liberar a carga.</div>
+  `;
+
+  if (banho.length) {
+    html += `<div style="font-size:11px;font-weight:700;letter-spacing:1px;color:var(--teal);margin-top:4px;margin-bottom:6px">💧 ESTOQUE BANHO (${banho.length})</div>`;
+    banho.forEach(b => {
+      html += `<div class="stock-option" onclick="mam_selecionarEstoque('BANHO','${b.id}')">
+        <div class="stock-option-info">
+          <div class="stock-option-title">${b.produto}</div>
+          <div class="stock-option-sub">${b.id} · ainda sem cor (será aplicada agora) · saída em BANHO</div>
+        </div>
+        <span class="badge badge-stock">USAR</span>
+      </div>`;
+    });
+  }
+  if (pa.length) {
+    html += `<div style="font-size:11px;font-weight:700;letter-spacing:1px;color:var(--green);margin-top:10px;margin-bottom:6px">🏷 ESTOQUE PRODUTO ACABADO (${pa.length}) — cor "${cor}"</div>`;
+    pa.forEach(b => {
+      html += `<div class="stock-option" onclick="mam_selecionarEstoque('PA','${b.id}')">
+        <div class="stock-option-info">
+          <div class="stock-option-title">${b.produto}</div>
+          <div class="stock-option-sub">${b.id} · cor ${b.cor} · saída em QUALIDADE</div>
+        </div>
+        <span class="badge badge-green" style="font-size:10px">USAR</span>
+      </div>`;
+    });
+  }
+
+  // selected indicator
+  const sel = document.getElementById('mam-source')?.value;
+  const selId = document.getElementById('mam-source-id')?.value;
+  if (sel && sel !== 'NOVA' && selId) {
+    html += `<div style="margin-top:10px;padding:10px 14px;background:rgba(245,158,11,0.1);border:1px solid var(--amber);border-radius:6px;display:flex;justify-content:space-between;align-items:center">
+      <span style="font-size:12px;color:var(--amber);font-weight:600">✓ Item de estoque selecionado: ${selId} (${sel})</span>
+      <button class="btn-sm btn-outline" onclick="mam_limparEstoque()" style="font-size:11px;padding:4px 10px">Limpar</button>
+    </div>`;
+  }
+  html += `</div>`;
+  area.innerHTML = html;
+}
+
+function mam_selecionarEstoque(tipo, id) {
+  document.getElementById('mam-source').value = tipo;
+  document.getElementById('mam-source-id').value = id;
+  showToast(`✓ Item ${id} selecionado do Estoque ${tipo}`, 'info');
+  mam_atualizarStock();
+}
+function mam_limparEstoque() {
+  document.getElementById('mam-source').value = 'NOVA';
+  document.getElementById('mam-source-id').value = '';
+  mam_atualizarStock();
+}
+
+function salvarMaquinaCarga() {
+  const cargaId = state.modalCargaId;
+  const c = state.cargas.find(x => x.id === cargaId);
+  if (!c) return;
+  if (c.status !== 'PLANEJADA') { showToast('Carga já liberada!', 'error'); return; }
+
+  const codigo = document.getElementById('mam-produto').value;
+  const cor    = document.getElementById('mam-cor').value.trim();
+  const op     = document.getElementById('mam-op').value.trim();
+  const data   = document.getElementById('mam-data').value;
+  const source = document.getElementById('mam-source').value;
+  const sourceId = document.getElementById('mam-source-id').value;
+
+  if (!codigo) { showToast('Selecione o produto!', 'error'); return; }
+  if (!cor)    { showToast('Informe a cor!', 'error'); return; }
+  if (!op)     { showToast('Informe a Ordem de Produção (OP)!', 'error'); return; }
+
+  const p = PRODUTOS_CATALOGO.find(x => x.codigo === codigo);
+  const newId = 'ORD-' + String(100 + state.ordens.length).padStart(3, '0');
+
+  const ordem = {
+    id: newId,
+    cargaId: c.id,
+    carga: c.numero,
+    op,
+    produto: `${p.codigo} - ${p.nome}`,
+    cor: cor.toUpperCase(),
+    dataEntrega: data || null,
+    semana: c.semana,
+    temDobra: document.getElementById('mam-dobra').checked,
+    temRobo: document.getElementById('mam-robo').checked,
+    temCarenagem: document.getElementById('mam-carenagem').checked,
+    setorAtual: 'PLANEJADA',
+    setoresConcluidos: [],
+    status: 'PLANEJADA',
+    producaoEstoque: false,
+    origemEstoque: source === 'NOVA' ? null : source,
+    estoqueOrigemId: source === 'NOVA' ? null : sourceId,
+  };
+  state.ordens.push(ordem);
+  saveData();
+  addLog(newId, c.id, ordem.produto, null, null, 'PLANEJADA', `Adicionada à carga ${c.numero}${source!=='NOVA' ? ' (puxando '+sourceId+' do Estoque '+source+')' : ''}`);
+
+  closeModal('modal-add-maquina');
+  showToast(`✓ Máquina ${newId} adicionada à carga ${c.numero}`, 'success');
+  renderPage(state.paginaAtual);
+}
+
+function removerMaquinaCarga(id) {
+  const o = state.ordens.find(x => x.id === id);
+  if (!o) return;
+  if (o.status !== 'PLANEJADA') { showToast('Só é possível remover máquinas planejadas (não liberadas).', 'error'); return; }
+  if (!confirm(`Remover ${o.id} (${o.produto}) da carga?`)) return;
+  state.ordens = state.ordens.filter(x => x.id !== id);
+  saveData();
+  addLog(o.id, o.cargaId, o.produto, 'PLANEJADA', null, 'REMOVIDA', 'Removida da carga antes da liberação');
+  showToast(`✓ Máquina ${id} removida`, 'info');
+  renderPage(state.paginaAtual);
+}
+
+// ── LIBERAR CARGA — coloca todas as máquinas no fluxo ──
+function liberarCarga(cargaId) {
+  const c = state.cargas.find(x => x.id === cargaId);
+  if (!c) return;
+  const maquinas = state.ordens.filter(o => o.cargaId === cargaId);
+  if (!maquinas.length) { showToast('Carga vazia — adicione máquinas antes de liberar.', 'error'); return; }
+  if (!confirm(`Liberar carga ${c.numero} com ${maquinas.length} máquina(s)? As máquinas entrarão na produção e os itens de estoque selecionados serão descontados.`)) return;
+
+  c.status = 'LIBERADA';
+  c.dataLiberacao = new Date().toISOString();
+
+  maquinas.forEach(m => {
+    let setorEntrada = 'CORTE';
+    // Se foi puxada do estoque na programação → entra no setor correto
+    if (m.origemEstoque === 'BANHO') {
+      setorEntrada = 'BANHO';
+      // Tudo antes de BANHO já foi feito (no item original do estoque)
+      m.setoresConcluidos = ['CORTE'];
+      if (m.temDobra) m.setoresConcluidos.push('DOBRA');
+      m.setoresConcluidos.push('ALM. FUNDO');
+      if (m.temRobo) m.setoresConcluidos.push('ROBÔ'); else m.setoresConcluidos.push('PRÉ MONT.','MONT.01');
+      m.setoresConcluidos.push('ACABAMENTO');
+      // Descontar do estoque
+      if (m.estoqueOrigemId) {
+        state.ordens = state.ordens.filter(x => x.id !== m.estoqueOrigemId);
+        addLog(m.estoqueOrigemId, c.id, m.produto, 'ESTOQUE BANHO', null, 'CONSUMIDO', `Consumido pela carga ${c.numero} → máquina ${m.id}`);
+      }
+    } else if (m.origemEstoque === 'PA') {
+      setorEntrada = 'QUALIDADE';
+      m.setoresConcluidos = getFlowSteps(m).filter(s => s !== 'QUALIDADE' && s !== 'EXPEDIÇÃO');
+      // Descontar do estoque PA
+      if (m.estoqueOrigemId) {
+        state.ordens = state.ordens.filter(x => x.id !== m.estoqueOrigemId);
+        addLog(m.estoqueOrigemId, c.id, m.produto, 'ESTOQUE PA', null, 'CONSUMIDO', `Consumido pela carga ${c.numero} → máquina ${m.id}`);
+      }
+    }
+    m.setorAtual = setorEntrada;
+    m.status = 'EM_PRODUCAO';
+    addLog(m.id, c.id, m.produto, 'PLANEJADA', null, setorEntrada, `Liberada via carga ${c.numero}`);
+  });
+
+  saveCargas(); saveData();
+  addLog(null, c.id, `CARGA ${c.numero}`, 'PLANEJADA', null, 'LIBERADA', `${maquinas.length} máquina(s) liberadas para produção`);
+  showToast(`✓ Carga ${c.numero} liberada — ${maquinas.length} máquina(s) na produção`, 'success');
+  renderPage(state.paginaAtual);
+}
+
+// ═══════════════════════════════════════════════════
+//  PRODUÇÃO PARA ESTOQUE (sem carga)
+// ═══════════════════════════════════════════════════
+function renderProducaoEstoque(el, topTitle, topSub, topActions) {
+  topTitle.textContent = '🏭 Produção para Estoque';
+  topSub.textContent = 'Máquinas produzidas sem carga associada — seguem o fluxo normal de produção';
+  topActions.innerHTML = `<button class="btn-sm btn-amber" onclick="openProdEstoque()">➕ Nova Produção Estoque</button>`;
+
+  const ordens = state.ordens.filter(o => o.producaoEstoque === true);
+
+  if (!ordens.length) {
+    el.innerHTML = `<div class="empty-state"><div class="empty-icon">🏭</div><div class="empty-title">Nenhuma produção para estoque</div><div class="empty-sub">Crie a primeira máquina de produção para estoque.</div></div>`;
+    return;
+  }
+
+  el.innerHTML = `
+    <div class="read-only-banner">
+      ℹ️ Estas máquinas <strong>não estão associadas a nenhuma carga</strong>. Elas seguem o fluxo de produção normal e, ao serem aprovadas em qualidade, vão para o <strong>Estoque Produto Acabado</strong>.
+    </div>
+    <div class="order-card-grid">${ordens.map(renderOrderCard).join('')}</div>
+  `;
+}
+
+function openProdEstoque() {
+  const form = document.getElementById('prod-estoque-form');
+  form.innerHTML = `
+    <div class="form-section">
+      <div class="form-section-title">Identificação</div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label">Produto *</label>
+          <select class="form-select" id="pe-produto" onchange="pe_onProdutoChange()">
+            <option value="">— selecione —</option>
+            ${PRODUTOS_CATALOGO.map(p => `<option value="${p.codigo}">${p.codigo} - ${p.nome}</option>`).join('')}
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Cor *</label>
+          <input type="text" class="form-input" id="pe-cor" placeholder="Ex: PRETO FOSCO">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Identificador Interno</label>
+          <input type="text" class="form-input" id="pe-op" placeholder="Ex: EST-003" value="EST-${String(state.ordens.filter(o=>o.producaoEstoque).length+1).padStart(3,'0')}">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Semana</label>
+          <input type="text" class="form-input" id="pe-semana" value="1° SEM MAIO 26">
+        </div>
+      </div>
+    </div>
+    <div class="form-section">
+      <div class="form-section-title">Atributos de Fluxo</div>
+      <div class="form-check-grid">
+        <div class="form-check-item"><input type="checkbox" id="pe-dobra"><label for="pe-dobra">🔧 Passa por Dobra</label></div>
+        <div class="form-check-item"><input type="checkbox" id="pe-robo"><label for="pe-robo">🤖 Vai pro Robô</label></div>
+        <div class="form-check-item"><input type="checkbox" id="pe-carenagem"><label for="pe-carenagem">🛡 Tem Carenagem</label></div>
+      </div>
+    </div>
+  `;
+  document.getElementById('modal-prod-estoque').classList.add('open');
+}
+
+function pe_onProdutoChange() {
+  const codigo = document.getElementById('pe-produto').value;
+  const p = PRODUTOS_CATALOGO.find(x => x.codigo === codigo);
+  if (!p) return;
+  document.getElementById('pe-dobra').checked = p.temDobra;
+  document.getElementById('pe-robo').checked = p.temRobo;
+  document.getElementById('pe-carenagem').checked = p.temCarenagem;
+}
+
+function salvarProdEstoque() {
+  const codigo = document.getElementById('pe-produto').value;
+  const cor = document.getElementById('pe-cor').value.trim();
+  const op  = document.getElementById('pe-op').value.trim();
+  const semana = document.getElementById('pe-semana').value.trim() || '1° SEM MAIO 26';
+  if (!codigo) { showToast('Selecione o produto!', 'error'); return; }
+  if (!cor)    { showToast('Informe a cor!', 'error'); return; }
+  const p = PRODUTOS_CATALOGO.find(x => x.codigo === codigo);
+  const newId = 'ORD-' + String(100 + state.ordens.length).padStart(3, '0');
+  const ordem = {
+    id: newId,
+    cargaId: null,
+    carga: null,
+    op: op || newId,
+    produto: `${p.codigo} - ${p.nome}`,
+    cor: cor.toUpperCase(),
+    dataEntrega: null,
+    semana,
+    temDobra: document.getElementById('pe-dobra').checked,
+    temRobo: document.getElementById('pe-robo').checked,
+    temCarenagem: document.getElementById('pe-carenagem').checked,
+    setorAtual: 'CORTE',
+    setoresConcluidos: [],
+    status: 'EM_PRODUCAO',
+    producaoEstoque: true,
+  };
+  state.ordens.push(ordem);
+  saveData();
+  addLog(newId, null, ordem.produto, null, null, 'CORTE', 'Produção para estoque iniciada (sem carga)');
+  closeModal('modal-prod-estoque');
+  showToast(`✓ ${newId} criada e iniciada em CORTE`, 'success');
+  renderPage(state.paginaAtual);
+}
+
+// ═══════════════════════════════════════════════════
+//  ESTOQUE BANHO (READ-ONLY)
+// ═══════════════════════════════════════════════════
+function renderEstoqueBanho(el, topTitle, topSub, topActions) {
+  const ordens = state.ordens.filter(o => o.status === 'ESTOQUE_BANHO');
+  topTitle.textContent = '💧 Estoque Banho';
+  topSub.textContent = `${ordens.length} item(ns) em estoque · somente visualização`;
+  topActions.innerHTML = '';
+
+  if (!ordens.length) {
+    el.innerHTML = `<div class="empty-state"><div class="empty-icon">💧</div><div class="empty-title">Estoque Vazio</div><div class="empty-sub">Nenhum item no estoque banho.</div></div>`;
+    return;
+  }
+
+  el.innerHTML = `
+    <div class="read-only-banner">
+      🔒 <strong>Tela somente leitura.</strong> Itens deste estoque são consumidos automaticamente pela <strong>programação do PCP</strong> ao adicionar máquinas com produto correspondente em uma carga.
+    </div>
+    <div class="estoque-grid">
+      ${ordens.map(o => `
+      <div class="estoque-card">
+        <div class="estoque-card-title">${o.produto}</div>
+        <div class="estoque-card-meta">${o.id} · ${o.semana}</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:4px">
+          ${o.temDobra ? '<span class="badge badge-amber" style="font-size:9px">DOBRA</span> ':''}
+          ${o.temCarenagem ? '<span class="badge badge-amber" style="font-size:9px">CARENAGEM</span>':''}
+        </div>
+      </div>
+      `).join('')}
+    </div>
+  `;
+}
+
+// ═══════════════════════════════════════════════════
+//  ESTOQUE PRODUTO ACABADO (READ-ONLY)
+// ═══════════════════════════════════════════════════
+function renderEstoquePA(el, topTitle, topSub, topActions) {
+  const ordens = state.ordens.filter(o => o.status === 'ESTOQUE_PA');
+  topTitle.textContent = '🏷 Estoque Produto Acabado';
+  topSub.textContent = `${ordens.length} item(ns) em estoque · somente visualização`;
+  topActions.innerHTML = '';
+
+  if (!ordens.length) {
+    el.innerHTML = `<div class="empty-state"><div class="empty-icon">🏷</div><div class="empty-title">Estoque Vazio</div><div class="empty-sub">Nenhum item em produto acabado.</div></div>`;
+    return;
+  }
+
+  el.innerHTML = `
+    <div class="read-only-banner">
+      🔒 <strong>Tela somente leitura.</strong> Itens deste estoque (já com cor aplicada) são consumidos automaticamente pela <strong>programação do PCP</strong> ao adicionar uma máquina com mesmo produto + mesma cor em uma carga. Ao liberar a carga, a máquina entra direto em <strong>Qualidade</strong>.
+    </div>
+    <div class="estoque-grid">
+      ${ordens.map(o => `
+      <div class="estoque-card">
+        <div class="estoque-card-title">${o.produto}</div>
+        <div class="estoque-card-meta">${o.id} · cor <strong style="color:var(--green)">${o.cor}</strong></div>
+        <div style="font-size:11px;color:var(--text3);margin-top:4px">${o.semana}</div>
+      </div>
+      `).join('')}
+    </div>
+  `;
+}
+
+// ═══════════════════════════════════════════════════
+//  MEU SETOR
 // ═══════════════════════════════════════════════════
 function renderMeuSetor(el, topTitle, topSub, topActions) {
   const u = state.usuario;
   const setor = u.setor;
-  const ordens = state.ordens.filter(o => o.setorAtual === setor);
+  const ordens = state.ordens.filter(o => o.setorAtual === setor && o.status === 'EM_PRODUCAO');
   topTitle.textContent = `${SETOR_ICON[setor]||'⚙'} ${setor}`;
   topSub.textContent = `${ordens.length} ordem(ns) neste setor`;
 
@@ -1179,15 +2155,17 @@ function renderOrderCard(o) {
     <div class="order-card-header">
       <div>
         <div class="order-card-op">OP: ${o.op||'S/N'}</div>
-        <div class="order-card-carga">Carga: ${o.carga||'—'}</div>
+        <div class="order-card-carga">${o.producaoEstoque ? '🏭 PROD. ESTOQUE' : 'Carga: '+(o.carga||'—')}</div>
       </div>
       <span class="badge ${getSetorBadgeClass(o.setorAtual)}">${o.setorAtual}</span>
     </div>
     <div class="order-card-product">${o.produto}</div>
     <div class="order-card-color">Cor: ${o.cor||'—'} · ${o.semana||'—'}</div>
     <div class="order-card-meta">
-      ${o.temCarenagem ? '<span class="badge badge-amber">CARENAGEM</span>' : ''}
+      ${o.temCarenagem && !o.pulaCarenagem ? '<span class="badge badge-amber">CARENAGEM</span>' : ''}
+      ${o.pulaCarenagem ? '<span class="badge badge-reject-mont">PULA CARENAGEM</span>' : ''}
       ${o.temRobo ? '<span class="badge badge-violet">ROBÔ</span>' : ''}
+      ${o.origemEstoque ? `<span class="badge badge-stock">DE ESTOQUE ${o.origemEstoque}</span>` : ''}
       ${o.dataEntrega ? `<span class="badge badge-gray">📅 ${formatDate(o.dataEntrega)}</span>` : ''}
     </div>
     <div style="margin-bottom:12px">
@@ -1205,7 +2183,7 @@ function renderOrderCard(o) {
 }
 
 // ═══════════════════════════════════════════════════
-//  QUALIDADE
+//  QUALIDADE — com tipos de reprovação
 // ═══════════════════════════════════════════════════
 function renderQualidade(el, topTitle, topSub, topActions) {
   const ordens = state.ordens.filter(o => o.setorAtual === 'QUALIDADE' && o.status === 'EM_PRODUCAO');
@@ -1223,37 +2201,117 @@ function renderQualidade(el, topTitle, topSub, topActions) {
         <div>
           <div class="quality-order-product">${o.produto}</div>
           <div class="quality-order-meta">
-            Carga: ${o.carga||'—'} · OP: ${o.op||'S/N'} · Cor: ${o.cor||'—'}
+            ${o.cargaId ? 'Carga: '+o.carga : '🏭 Prod. Estoque'} · OP: ${o.op||'S/N'} · Cor: ${o.cor||'—'}
             ${o.dataEntrega ? ' · Entrega: '+formatDate(o.dataEntrega) : ''}
           </div>
         </div>
         <div style="display:flex;gap:6px;flex-wrap:wrap">
           ${o.temCarenagem ? '<span class="badge badge-amber">CARENAGEM</span>' : ''}
-          <span class="badge badge-gray">${o.semana}</span>
+          ${o.origemEstoque ? `<span class="badge badge-stock">ESTOQUE ${o.origemEstoque}</span>` : ''}
+          <span class="badge badge-gray">${o.semana||'—'}</span>
         </div>
       </div>
       <div style="margin-bottom:14px">
         ${renderMiniFlow(o)}
       </div>
       <div class="quality-actions">
-        <button class="btn-sm btn-outline" onclick="verDetalhes('${o.id}')">📜 Ver Rastreabilidade</button>
-        <button class="btn-sm btn-red" onclick="openQualidade('${o.id}')">Avaliar →</button>
+        <button class="btn-sm btn-outline" onclick="verDetalhes('${o.id}')">📜 Rastreabilidade</button>
+        <button class="btn-sm btn-red" onclick="openReprovar('${o.id}')">✗ Reprovar</button>
+        <button class="btn-sm btn-green" onclick="aprovarQualidade('${o.id}')">✓ Aprovar</button>
       </div>
     </div>
   `).join('');
 }
 
+function aprovarQualidade(id) {
+  const o = state.ordens.find(x => x.id === id);
+  if (!o) return;
+  if (!confirm(`Confirmar APROVAÇÃO da ordem ${id}?`)) return;
+
+  // Se for produção para estoque → vai para ESTOQUE PA (não expedição)
+  if (o.producaoEstoque) {
+    o.status = 'ESTOQUE_PA';
+    o.setorAtual = 'ESTOQUE PA';
+    if (!o.setoresConcluidos.includes('QUALIDADE')) o.setoresConcluidos.push('QUALIDADE');
+    o.dataAvaliacao = new Date().toLocaleDateString('pt-BR');
+    addLog(id, null, o.produto, 'QUALIDADE', null, 'ESTOQUE PA', 'Aprovado — produção para estoque');
+    showToast(`✓ Aprovado — ${o.produto} para Estoque PA`, 'success');
+  } else {
+    o.status = 'APROVADO';
+    o.setorAtual = 'EXPEDIÇÃO';
+    o.dataAvaliacao = new Date().toLocaleDateString('pt-BR');
+    if (!o.setoresConcluidos.includes('QUALIDADE')) o.setoresConcluidos.push('QUALIDADE');
+    addLog(id, o.cargaId, o.produto, 'QUALIDADE', null, 'EXPEDIÇÃO', 'Aprovado em qualidade');
+    showToast(`✓ Aprovado — pronto para expedição`, 'success');
+  }
+  saveData();
+  renderPage(state.paginaAtual);
+}
+
+function openReprovar(id) {
+  const o = state.ordens.find(x => x.id === id);
+  if (!o) return;
+  state.modalOrdemId = id;
+  document.getElementById('modal-rep-sub').textContent = `${o.id} · ${o.produto}`;
+  document.getElementById('rep-motivo').value = '';
+  document.getElementById('rep-tipo').value = 'MONTAGEM';
+  // Habilita/oculta opção CARENAGEM com base em temCarenagem
+  const optCaren = document.getElementById('rep-opt-caren');
+  if (o.temCarenagem && !o.pulaCarenagem) {
+    optCaren.style.display = '';
+    optCaren.disabled = false;
+  } else {
+    optCaren.style.display = 'none';
+    optCaren.disabled = true;
+  }
+  document.getElementById('modal-reprovar').classList.add('open');
+}
+
+function confirmarReprovacao() {
+  const id = state.modalOrdemId;
+  const o = state.ordens.find(x => x.id === id);
+  if (!o) return;
+  const tipo = document.getElementById('rep-tipo').value;
+  const motivo = document.getElementById('rep-motivo').value.trim();
+  if (!motivo) { showToast('Descreva o motivo da reprovação.', 'error'); return; }
+
+  o.reprovacao = { tipo, motivo, data: new Date().toISOString(), por: state.usuario.email };
+
+  // Remove QUALIDADE da lista de concluídos pra ficar consistente (passou e voltou)
+  o.setoresConcluidos = (o.setoresConcluidos||[]).filter(s => s !== 'QUALIDADE');
+
+  if (tipo === 'MONTAGEM') {
+    // Volta pra MONT. FINAL e sinaliza pra pular carenagem após retrabalho
+    o.setorAtual = 'MONT. FINAL';
+    o.pulaCarenagem = true;
+    // Remove MONT. FINAL e CARENAGEM dos concluídos pois vai refazer
+    o.setoresConcluidos = o.setoresConcluidos.filter(s => s !== 'MONT. FINAL' && s !== 'CARENAGEM');
+    addLog(id, o.cargaId, o.produto, 'QUALIDADE', null, 'MONT. FINAL', `REPROVADO MONTAGEM: ${motivo} (após retrabalho pula carenagem)`);
+    showToast(`✗ Reprovado em montagem — voltou para MONT. FINAL`, 'error');
+  } else if (tipo === 'CARENAGEM') {
+    o.setorAtual = 'CARENAGEM';
+    o.setoresConcluidos = o.setoresConcluidos.filter(s => s !== 'CARENAGEM');
+    addLog(id, o.cargaId, o.produto, 'QUALIDADE', null, 'CARENAGEM', `REPROVADO CARENAGEM: ${motivo}`);
+    showToast(`✗ Reprovado em carenagem — voltou para CARENAGEM`, 'error');
+  }
+  o.status = 'EM_PRODUCAO'; // continua em produção (após retrabalho)
+
+  saveData();
+  closeModal('modal-reprovar');
+  renderPage(state.paginaAtual);
+}
+
 function renderAprovados(el, topTitle, topSub, topActions) {
-  const ordens = state.ordens.filter(o => o.status === 'APROVADO' || o.status === 'EXPEDIDO' || o.status === 'REPROVADO');
+  const ordens = state.ordens.filter(o => o.status === 'APROVADO' || o.status === 'EXPEDIDO' || o.status === 'REPROVADO' || o.status === 'ESTOQUE_PA');
   topTitle.textContent = 'Ordens Avaliadas';
-  topSub.textContent = `${ordens.length} ordens com avaliação`;
+  topSub.textContent = `${ordens.length} ordens com avaliação registrada`;
   el.innerHTML = `<div class="table-wrap"><div class="table-scroll-wrap"><table>
     <thead><tr><th>Ordem</th><th>Produto</th><th>Cor</th><th>Resultado</th><th>Data</th><th>Ações</th></tr></thead>
     <tbody>${ordens.length ? ordens.map(o => `<tr>
       <td class="td-mono">${o.id}</td>
       <td style="font-size:13px;font-weight:600">${o.produto}</td>
       <td style="font-size:12px;color:var(--text3)">${o.cor||'—'}</td>
-      <td>${o.status==='APROVADO'?'<span class="badge badge-green">✓ Aprovado</span>':o.status==='EXPEDIDO'?'<span class="badge badge-amber">🚚 Expedido</span>':'<span class="badge badge-red">✗ Reprovado</span>'}</td>
+      <td>${o.status==='APROVADO'?'<span class="badge badge-green">✓ Aprovado</span>':o.status==='EXPEDIDO'?'<span class="badge badge-amber">🚚 Expedido</span>':o.status==='ESTOQUE_PA'?'<span class="badge badge-stock">🏷 Estoque PA</span>':'<span class="badge badge-red">✗ Reprovado</span>'}</td>
       <td class="td-mono" style="font-size:12px">${o.dataAvaliacao||'—'}</td>
       <td><button class="btn-sm btn-outline" onclick="verDetalhes('${o.id}')" style="font-size:12px;padding:5px 10px">📜 Ver</button>
       ${o.status==='APROVADO'?`<button class="btn-sm btn-amber" onclick="expedir('${o.id}')" style="font-size:12px;padding:5px 10px">🚚 Expedir</button>`:''}
@@ -1263,16 +2321,52 @@ function renderAprovados(el, topTitle, topSub, topActions) {
 }
 
 // ═══════════════════════════════════════════════════
-//  PIPELINE
+//  PIPELINE — com filtros (Carga, Cor, Busca)
 // ═══════════════════════════════════════════════════
 function renderPipeline(el, topTitle, topSub, topActions) {
   topTitle.textContent = '🔄 Pipeline de Produção';
-  topSub.textContent = 'Visão por setor de todas as ordens ativas';
+  topSub.textContent = 'Somente máquinas de cargas LIBERADAS ou Produção para Estoque';
 
-  let html = '';
+  // Cargas únicas em produção
+  const cargasAtivas = [...new Set(state.ordens.filter(o => o.status === 'EM_PRODUCAO' && o.cargaId).map(o => o.cargaId))];
+  const coresAtivas = [...new Set(state.ordens.filter(o => o.status === 'EM_PRODUCAO' && o.cor).map(o => o.cor))].sort();
+
+  const f = state.pipelineFilter;
+  let ordensFiltradas = state.ordens.filter(o => o.status === 'EM_PRODUCAO');
+  if (f.busca) {
+    const q = f.busca.toLowerCase();
+    ordensFiltradas = ordensFiltradas.filter(o => o.produto.toLowerCase().includes(q) || String(o.op||'').toLowerCase().includes(q) || o.id.toLowerCase().includes(q));
+  }
+  if (f.cor) ordensFiltradas = ordensFiltradas.filter(o => o.cor === f.cor);
+  if (f.carga) {
+    if (f.carga === '__ESTOQUE__') ordensFiltradas = ordensFiltradas.filter(o => o.producaoEstoque);
+    else ordensFiltradas = ordensFiltradas.filter(o => o.cargaId === f.carga);
+  }
+
+  let html = `
+    <div class="pipeline-filters">
+      <input type="text" class="filter-input" id="pl-busca" placeholder="🔍 Buscar máquina / OP / ID..." value="${f.busca||''}" oninput="setPipelineFilter('busca', this.value)">
+      <select class="filter-select" id="pl-carga" onchange="setPipelineFilter('carga', this.value)">
+        <option value="">Todas as Cargas</option>
+        <option value="__ESTOQUE__" ${f.carga==='__ESTOQUE__'?'selected':''}>🏭 Produção para Estoque</option>
+        ${cargasAtivas.map(cid => {
+          const c = state.cargas.find(x => x.id === cid);
+          return c ? `<option value="${cid}" ${f.carga===cid?'selected':''}>📦 Carga ${c.numero}</option>` : '';
+        }).join('')}
+      </select>
+      <select class="filter-select" id="pl-cor" onchange="setPipelineFilter('cor', this.value)">
+        <option value="">Todas as Cores</option>
+        ${coresAtivas.map(c => `<option value="${c}" ${f.cor===c?'selected':''}>${c}</option>`).join('')}
+      </select>
+      ${(f.busca||f.cor||f.carga) ? `<button class="btn-sm btn-outline" onclick="limparPipelineFilter()">✕ Limpar filtros</button>` : ''}
+    </div>
+  `;
+
+  let total = 0;
   SETORES_FLOW.forEach(setor => {
-    const ordens = state.ordens.filter(o => o.setorAtual === setor && o.status === 'EM_PRODUCAO');
+    const ordens = ordensFiltradas.filter(o => o.setorAtual === setor);
     if (!ordens.length) return;
+    total += ordens.length;
     html += `<div style="margin-bottom:24px">
       <div class="section-header">
         <div class="section-title">${SETOR_ICON[setor]||''} ${setor} <span class="section-count">${ordens.length}</span></div>
@@ -1283,57 +2377,25 @@ function renderPipeline(el, topTitle, topSub, topActions) {
     </div>`;
   });
 
-  const naoLib = state.ordens.filter(o => o.status === 'NAO_LIBERADO');
-  if (naoLib.length) {
-    html += `<div style="margin-bottom:24px">
-      <div class="section-header"><div class="section-title">📋 Não Liberado <span class="section-count">${naoLib.length}</span></div></div>
-      <div class="table-wrap"><div class="table-scroll-wrap"><table>
-        <thead><tr><th>Ordem</th><th>Produto</th><th>Cor</th><th>Semana</th><th>Atributos</th><th>Ações</th></tr></thead>
-        <tbody>${naoLib.map(o => `<tr>
-          <td class="td-mono">${o.id}</td>
-          <td style="font-size:13px;font-weight:600">${o.produto}</td>
-          <td style="font-size:12px;color:var(--text3)">${o.cor||'—'}</td>
-          <td class="td-mono" style="font-size:12px">${o.semana||'—'}</td>
-          <td>${o.temCarenagem?'<span class="badge badge-amber" style="font-size:10px">CARENAGEM</span>':''}${o.temRobo?'<span class="badge badge-violet" style="font-size:10px">ROBÔ</span>':''}</td>
-          <td><button class="btn-sm btn-amber" onclick="liberarOrdem('${o.id}')" style="font-size:12px;padding:5px 12px">▶ Liberar</button></td>
-        </tr>`).join('')}
-        </tbody>
-      </table></div></div>
-    </div>`;
+  if (total === 0) {
+    html += `<div class="empty-state"><div class="empty-icon">🎉</div><div class="empty-title">Nenhuma máquina ativa com os filtros</div><div class="empty-sub">${(f.busca||f.cor||f.carga) ? 'Ajuste ou limpe os filtros.' : 'Libere uma carga para iniciar a produção.'}</div></div>`;
   }
-
-  el.innerHTML = html || `<div class="empty-state"><div class="empty-icon">🎉</div><div class="empty-title">Nenhuma ordem ativa</div></div>`;
+  el.innerHTML = html;
 }
 
-// ═══════════════════════════════════════════════════
-//  ESTOQUE BANHO
-// ═══════════════════════════════════════════════════
-function renderEstoqueBanho(el, topTitle, topSub, topActions) {
-  const ordens = state.ordens.filter(o => o.status === 'ESTOQUE_BANHO');
-  topTitle.textContent = '💧 Estoque Banho';
-  topSub.textContent = `${ordens.length} itens em estoque de banho`;
-  topActions.innerHTML = '';
-
-  if (!ordens.length) {
-    el.innerHTML = `<div class="empty-state"><div class="empty-icon">💧</div><div class="empty-title">Estoque Vazio</div><div class="empty-sub">Nenhum item no estoque de banho.</div></div>`;
-    return;
-  }
-
-  el.innerHTML = `
-  <div style="margin-bottom:16px;padding:14px;background:var(--card);border:1px solid var(--border);border-radius:var(--r);font-size:13px;color:var(--text2)">
-    ℹ️ Itens do Estoque Banho já passaram pelo processo de galvanização e estão prontos para ir direto para <strong style="color:var(--amber)">PINTURA</strong>.
-  </div>
-  <div class="estoque-grid">
-    ${ordens.map(o => `
-    <div class="estoque-card">
-      <div class="estoque-card-title">${o.produto}</div>
-      <div class="estoque-card-meta">ID: ${o.id} · Semana: ${o.semana}</div>
-      <div class="estoque-card-footer">
-        <button class="btn-sm btn-blue" onclick="usarEstoqueBanho('${o.id}')" style="font-size:12px;padding:6px 14px">🎨 Usar → PINTURA</button>
-      </div>
-    </div>
-    `).join('')}
-  </div>`;
+function setPipelineFilter(key, value) {
+  state.pipelineFilter[key] = value;
+  renderPipeline(document.getElementById('main-content'),
+    document.getElementById('topbar-title'),
+    document.getElementById('topbar-subtitle'),
+    document.getElementById('topbar-actions'));
+}
+function limparPipelineFilter() {
+  state.pipelineFilter = { busca:'', cor:'', carga:'' };
+  renderPipeline(document.getElementById('main-content'),
+    document.getElementById('topbar-title'),
+    document.getElementById('topbar-subtitle'),
+    document.getElementById('topbar-actions'));
 }
 
 // ═══════════════════════════════════════════════════
@@ -1353,12 +2415,12 @@ function renderLog(el, topTitle, topSub, topActions) {
   el.innerHTML = `
   <div class="table-wrap">
     <div class="table-filters">
-      <input type="text" class="filter-input" placeholder="🔍 Buscar produto, ordem..." oninput="filtrarLog(this.value)">
+      <input type="text" class="filter-input" placeholder="🔍 Buscar produto, ordem, carga..." oninput="filtrarLog(this.value)">
     </div>
     <div class="table-scroll-wrap">
     <table>
       <thead><tr>
-        <th>Data/Hora</th><th>Ordem</th><th>Produto</th><th>Cor</th><th>De</th><th>Para</th><th>Usuário</th>
+        <th>Data/Hora</th><th>Ref.</th><th>Produto</th><th>De</th><th>Para</th><th>Ação</th><th>Usuário</th>
       </tr></thead>
       <tbody id="log-tbody">
         ${renderLogRows(logs)}
@@ -1372,11 +2434,11 @@ function renderLogRows(logs) {
   if (!logs.length) return `<tr><td colspan="7" style="text-align:center;padding:32px;color:var(--text3)">Nenhum registro</td></tr>`;
   return logs.map(l => `<tr>
     <td class="log-time">${formatTs(l.ts)}</td>
-    <td class="td-mono" style="font-size:12px">${l.orderId}</td>
-    <td style="max-width:200px;font-size:13px">${l.produto}</td>
-    <td style="font-size:12px;color:var(--text3)">${l.cor||'—'}</td>
+    <td class="td-mono" style="font-size:11px">${l.orderId || l.cargaId || '—'}</td>
+    <td style="max-width:220px;font-size:12px">${l.produto||'—'}</td>
     <td>${l.de ? `<span class="badge ${getSetorBadgeClass(l.de)}" style="font-size:10px">${l.de}</span>` : '—'}</td>
-    <td><span class="badge ${getSetorBadgeClass(l.para)}" style="font-size:10px">${l.para}</span></td>
+    <td>${l.para ? `<span class="badge ${getSetorBadgeClass(l.para)}" style="font-size:10px">${l.para}</span>` : '—'}</td>
+    <td style="font-size:11px;color:var(--text2);max-width:240px">${l.acao||'—'}</td>
     <td style="font-size:11px;color:var(--text3)">${l.usuario}</td>
   </tr>`).join('');
 }
@@ -1384,8 +2446,12 @@ function renderLogRows(logs) {
 function filtrarLog(v) {
   v = v.toLowerCase();
   const logs = state.log.slice().reverse().filter(l =>
-    l.produto.toLowerCase().includes(v) || l.orderId.toLowerCase().includes(v) ||
-    (l.de||'').toLowerCase().includes(v) || l.para.toLowerCase().includes(v)
+    (l.produto||'').toLowerCase().includes(v) ||
+    (l.orderId||'').toLowerCase().includes(v) ||
+    (l.cargaId||'').toLowerCase().includes(v) ||
+    (l.de||'').toLowerCase().includes(v) ||
+    (l.para||'').toLowerCase().includes(v) ||
+    (l.acao||'').toLowerCase().includes(v)
   );
   const tbody = document.getElementById('log-tbody');
   if (tbody) tbody.innerHTML = renderLogRows(logs);
@@ -1440,7 +2506,7 @@ function openAvancar(id) {
   document.getElementById('modal-order-info').innerHTML = `
     <div class="modal-info-item"><div class="modal-info-label">Ordem</div><div class="modal-info-value">${o.id}</div></div>
     <div class="modal-info-item"><div class="modal-info-label">OP</div><div class="modal-info-value">${o.op||'S/N'}</div></div>
-    <div class="modal-info-item"><div class="modal-info-label">Carga</div><div class="modal-info-value">${o.carga||'—'}</div></div>
+    <div class="modal-info-item"><div class="modal-info-label">Carga</div><div class="modal-info-value">${o.carga||(o.producaoEstoque?'PROD. ESTOQUE':'—')}</div></div>
     <div class="modal-info-item"><div class="modal-info-label">Produto</div><div class="modal-info-value" style="font-size:12px">${o.produto}</div></div>
     <div class="modal-info-item"><div class="modal-info-label">Cor</div><div class="modal-info-value">${o.cor||'—'}</div></div>
     <div class="modal-info-item"><div class="modal-info-label">Entrega</div><div class="modal-info-value">${o.dataEntrega ? formatDate(o.dataEntrega) : '—'}</div></div>`;
@@ -1456,17 +2522,15 @@ function confirmarAvanco() {
   const para = proximoSetor(o);
   if (!para) return;
 
-  // Update
   if (!o.setoresConcluidos) o.setoresConcluidos = [];
-  if (de !== 'NAO_LIBERADO' && de !== 'ESTOQUE BANHO') {
+  if (!['PLANEJADA','ESTOQUE BANHO','ESTOQUE PA'].includes(de) && !o.setoresConcluidos.includes(de)) {
     o.setoresConcluidos.push(de);
   }
   o.setorAtual = para;
   if (para === 'EXPEDIÇÃO') o.status = 'EXPEDIDO';
-  else if (o.status === 'NAO_LIBERADO') o.status = 'EM_PRODUCAO';
-  else if (o.status === 'ESTOQUE_BANHO') o.status = 'EM_PRODUCAO';
+  else if (o.status === 'PLANEJADA') o.status = 'EM_PRODUCAO';
 
-  addLog(id, o.produto, o.cor, de, para);
+  addLog(id, o.cargaId, o.produto, de, null, para, 'Avanço de setor');
   saveData();
   closeModal('modal-avancar');
   showToast(`✓ Ordem movida para ${para}`, 'success');
@@ -1474,77 +2538,14 @@ function confirmarAvanco() {
 }
 
 // ═══════════════════════════════════════════════════
-//  LIBERAR ORDEM (PCP)
+//  EXPEDIR
 // ═══════════════════════════════════════════════════
-function liberarOrdem(id) {
-  const o = state.ordens.find(o => o.id === id);
-  if (!o) return;
-  state.modalOrdemId = id;
-  openAvancar(id);
-}
-
-// ═══════════════════════════════════════════════════
-//  USAR ESTOQUE BANHO
-// ═══════════════════════════════════════════════════
-function usarEstoqueBanho(id) {
-  const o = state.ordens.find(o => o.id === id);
-  if (!o) return;
-  // Need color input
-  const cor = prompt(`Informe a COR para a ordem:\n${o.produto}`, 'PRETO FOSCO');
-  if (!cor) return;
-  o.cor = cor;
-  o.setorAtual = 'PINTURA';
-  o.status = 'EM_PRODUCAO';
-  if (!o.setoresConcluidos) o.setoresConcluidos = [];
-  addLog(id, o.produto, cor, 'ESTOQUE BANHO', 'PINTURA');
-  saveData();
-  showToast(`✓ Item do Estoque Banho enviado para PINTURA`, 'success');
-  renderPage(state.paginaAtual);
-}
-
-// ═══════════════════════════════════════════════════
-//  QUALIDADE
-// ═══════════════════════════════════════════════════
-function openQualidade(id) {
-  const o = state.ordens.find(o => o.id === id);
-  if (!o) return;
-  state.modalOrdemId = id;
-  document.getElementById('modal-qual-title').textContent = 'Inspeção de Qualidade';
-  document.getElementById('modal-qual-sub').textContent = o.produto;
-  document.getElementById('modal-qual-info').innerHTML = `
-    <div class="modal-info-item"><div class="modal-info-label">Ordem</div><div class="modal-info-value">${o.id}</div></div>
-    <div class="modal-info-item"><div class="modal-info-label">Carga</div><div class="modal-info-value">${o.carga||'—'}</div></div>
-    <div class="modal-info-item"><div class="modal-info-label">Cor</div><div class="modal-info-value">${o.cor||'—'}</div></div>
-    <div class="modal-info-item"><div class="modal-info-label">Entrega</div><div class="modal-info-value">${o.dataEntrega?formatDate(o.dataEntrega):'—'}</div></div>`;
-  document.getElementById('modal-qual-obs').value = '';
-  document.getElementById('modal-qualidade').classList.add('open');
-}
-
-function avaliarQualidade(resultado) {
-  const id = state.modalOrdemId;
-  const o = state.ordens.find(o => o.id === id);
-  if (!o) return;
-  const obs = document.getElementById('modal-qual-obs').value;
-  o.status = resultado === 'APROVADO' ? 'APROVADO' : 'REPROVADO';
-  o.dataAvaliacao = new Date().toLocaleDateString('pt-BR');
-  o.obsQualidade = obs;
-  if (!o.setoresConcluidos) o.setoresConcluidos = [];
-  if (!o.setoresConcluidos.includes('QUALIDADE')) o.setoresConcluidos.push('QUALIDADE');
-  if (resultado === 'APROVADO') o.setorAtual = 'EXPEDIÇÃO';
-
-  addLog(id, o.produto, o.cor, 'QUALIDADE', resultado === 'APROVADO' ? 'EXPEDIÇÃO' : 'REPROVADO');
-  saveData();
-  closeModal('modal-qualidade');
-  showToast(resultado === 'APROVADO' ? '✓ Produto APROVADO — Pronto para expedição' : '✗ Produto REPROVADO', resultado === 'APROVADO' ? 'success' : 'error');
-  renderPage(state.paginaAtual);
-}
-
 function expedir(id) {
   const o = state.ordens.find(o => o.id === id);
   if (!o) return;
   o.status = 'EXPEDIDO';
   o.setorAtual = 'EXPEDIÇÃO';
-  addLog(id, o.produto, o.cor, 'APROVADO', 'EXPEDIÇÃO');
+  addLog(id, o.cargaId, o.produto, 'APROVADO', null, 'EXPEDIÇÃO', 'Item expedido');
   saveData();
   showToast('🚚 Ordem expedida com sucesso!', 'success');
   renderPage(state.paginaAtual);
@@ -1557,7 +2558,6 @@ function verDetalhes(id) {
   const o = state.ordens.find(o => o.id === id);
   if (!o) return;
   const logs = state.log.filter(l => l.orderId === id);
-  const steps = getFlowSteps(o);
 
   document.getElementById('modal-det-sub').textContent = `${o.id} · ${o.produto}`;
   document.getElementById('modal-det-body').innerHTML = `
@@ -1567,24 +2567,33 @@ function verDetalhes(id) {
     <div class="modal-info-grid" style="margin-bottom:20px">
       <div class="modal-info-item"><div class="modal-info-label">Produto</div><div class="modal-info-value" style="font-size:12px">${o.produto}</div></div>
       <div class="modal-info-item"><div class="modal-info-label">Cor</div><div class="modal-info-value">${o.cor||'—'}</div></div>
-      <div class="modal-info-item"><div class="modal-info-label">Carga</div><div class="modal-info-value">${o.carga||'—'}</div></div>
+      <div class="modal-info-item"><div class="modal-info-label">${o.producaoEstoque?'Origem':'Carga'}</div><div class="modal-info-value">${o.producaoEstoque?'🏭 Prod. Estoque':o.carga||'—'}</div></div>
       <div class="modal-info-item"><div class="modal-info-label">OP</div><div class="modal-info-value">${o.op||'S/N'}</div></div>
       <div class="modal-info-item"><div class="modal-info-label">Semana</div><div class="modal-info-value" style="font-size:12px">${o.semana||'—'}</div></div>
       <div class="modal-info-item"><div class="modal-info-label">Status Atual</div><div class="modal-info-value"><span class="badge ${getSetorBadgeClass(o.setorAtual)}">${o.setorAtual}</span></div></div>
+      ${o.origemEstoque?`<div class="modal-info-item"><div class="modal-info-label">Origem Estoque</div><div class="modal-info-value"><span class="badge badge-stock">DE ESTOQUE ${o.origemEstoque}</span></div></div>`:''}
+      ${o.pulaCarenagem?`<div class="modal-info-item"><div class="modal-info-label">Retrabalho</div><div class="modal-info-value"><span class="badge badge-reject-mont">PULA CARENAGEM</span></div></div>`:''}
     </div>
+    ${o.reprovacao?`<div style="margin-bottom:16px;padding:14px;background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.2);border-radius:6px">
+      <div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--red);margin-bottom:6px">⚠ Reprovação Registrada</div>
+      <div style="font-size:13px;font-weight:600;margin-bottom:4px">Tipo: REPROVADO ${o.reprovacao.tipo}</div>
+      <div style="font-size:12px;color:var(--text2);margin-bottom:4px">${o.reprovacao.motivo}</div>
+      <div style="font-size:11px;color:var(--text3);font-family:'JetBrains Mono',monospace">${formatTs(o.reprovacao.data)} · ${o.reprovacao.por}</div>
+    </div>`:''}
     <div style="font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);margin-bottom:10px">Histórico de Movimentações</div>
     ${logs.length ? `<div class="table-wrap"><table>
-      <thead><tr><th>Data/Hora</th><th>De</th><th>Para</th><th>Usuário</th></tr></thead>
+      <thead><tr><th>Data/Hora</th><th>De</th><th>Para</th><th>Ação</th><th>Usuário</th></tr></thead>
       <tbody>${logs.map(l => `<tr>
         <td class="log-time">${formatTs(l.ts)}</td>
         <td>${l.de ? `<span class="badge ${getSetorBadgeClass(l.de)}" style="font-size:10px">${l.de}</span>` : '—'}</td>
-        <td><span class="badge ${getSetorBadgeClass(l.para)}" style="font-size:10px">${l.para}</span></td>
+        <td>${l.para ? `<span class="badge ${getSetorBadgeClass(l.para)}" style="font-size:10px">${l.para}</span>` : '—'}</td>
+        <td style="font-size:11px;max-width:200px">${l.acao||'—'}</td>
         <td style="font-size:11px;color:var(--text3)">${l.usuario}</td>
       </tr>`).join('')}</tbody>
     </table></div>` : `<div style="color:var(--text3);font-size:13px;padding:12px 0">Nenhum registro de movimentação ainda.</div>`}
-    ${state.usuario.perfil === 'pcp' || state.usuario.perfil === 'admin' ? `
+    ${(state.usuario.perfil === 'pcp' || state.usuario.perfil === 'admin') && proximoSetor(o) && o.status === 'EM_PRODUCAO' ? `
       <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border);display:flex;gap:10px">
-        ${o.setorAtual !== 'EXPEDIÇÃO' && o.setorAtual !== 'REPROVADO' && o.status !== 'EXPEDIDO' ? `<button class="btn-sm btn-amber" onclick="openAvancar('${o.id}');closeModal('modal-detalhes')">→ Avanço Manual</button>` : ''}
+        <button class="btn-sm btn-amber" onclick="openAvancar('${o.id}');closeModal('modal-detalhes')">→ Avanço Manual</button>
       </div>
     ` : ''}
   `;
@@ -1615,120 +2624,11 @@ function renderMiniFlow(o) {
 }
 
 // ═══════════════════════════════════════════════════
-//  NOVA ORDEM
-// ═══════════════════════════════════════════════════
-function openNovaOrdemModal() {
-  const form = document.getElementById('nova-ordem-form');
-  form.innerHTML = `
-  <div class="form-section">
-    <div class="form-section-title">Identificação</div>
-    <div class="form-grid">
-      <div class="form-group">
-        <label class="form-label">Produto / Máquina *</label>
-        <input type="text" class="form-input" id="no-produto" placeholder="Ex: 08281 - EXTENSOR LF-R PRA">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Cor</label>
-        <input type="text" class="form-input" id="no-cor" placeholder="Ex: PRETO FOSCO">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Número de Carga (Romaneio)</label>
-        <input type="text" class="form-input" id="no-carga" placeholder="Ex: 10477">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Ordem de Produção (OP)</label>
-        <input type="text" class="form-input" id="no-op" placeholder="Ex: 386254">
-      </div>
-    </div>
-  </div>
-  <div class="form-section">
-    <div class="form-section-title">Programação</div>
-    <div class="form-grid">
-      <div class="form-group">
-        <label class="form-label">Semana de Produção</label>
-        <input type="text" class="form-input" id="no-semana" placeholder="Ex: 1° SEM MAIO 26" value="1° SEM MAIO 26">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Data de Entrega</label>
-        <input type="date" class="form-input" id="no-data">
-      </div>
-    </div>
-  </div>
-  <div class="form-section">
-    <div class="form-section-title">Atributos de Fluxo</div>
-    <div class="form-check-grid">
-      <div class="form-check-item">
-        <input type="checkbox" id="no-dobra" checked>
-        <label for="no-dobra">🔧 Passa por Dobra</label>
-      </div>
-      <div class="form-check-item">
-        <input type="checkbox" id="no-robo">
-        <label for="no-robo">🤖 Usa Robô</label>
-      </div>
-      <div class="form-check-item">
-        <input type="checkbox" id="no-carenagem">
-        <label for="no-carenagem">🛡 Tem Carenagem</label>
-      </div>
-    </div>
-  </div>
-  <div class="form-section">
-    <div class="form-section-title">Ponto de Partida</div>
-    <div class="form-group">
-      <label class="form-label">Iniciar em</label>
-      <select class="form-select" id="no-setor-inicial">
-        <option value="NAO_LIBERADO">📋 Não Liberado (planejamento)</option>
-        <option value="CORTE">✂ Corte (início normal)</option>
-        <option value="PINTURA">🎨 Pintura (via Estoque Banho)</option>
-        <option value="QUALIDADE">✅ Qualidade (Produto Acabado)</option>
-      </select>
-    </div>
-  </div>`;
-  document.getElementById('modal-nova-ordem').classList.add('open');
-}
-
-function openNovaOrdem() {
-  openNovaOrdemModal();
-  navTo('pipeline'); // go to pipeline view
-}
-
-function salvarNovaOrdem() {
-  const produto = document.getElementById('no-produto').value.trim();
-  if (!produto) { showToast('Produto é obrigatório!', 'error'); return; }
-
-  const setorIni = document.getElementById('no-setor-inicial').value;
-  const newId = 'ORD-' + String(state.ordens.length + 100).padStart(3, '0');
-
-  const o = {
-    id: newId,
-    carga: document.getElementById('no-carga').value || null,
-    op: document.getElementById('no-op').value || null,
-    produto,
-    cor: document.getElementById('no-cor').value || null,
-    dataEntrega: document.getElementById('no-data').value || null,
-    semana: document.getElementById('no-semana').value || null,
-    temDobra: document.getElementById('no-dobra').checked,
-    temRobo: document.getElementById('no-robo').checked,
-    temCarenagem: document.getElementById('no-carenagem').checked,
-    setorAtual: setorIni,
-    setoresConcluidos: [],
-    status: setorIni === 'NAO_LIBERADO' ? 'NAO_LIBERADO' :
-            setorIni === 'PINTURA' ? 'EM_PRODUCAO' : 'EM_PRODUCAO',
-  };
-
-  state.ordens.push(o);
-  addLog(newId, o.produto, o.cor, null, setorIni === 'NAO_LIBERADO' ? 'PLANEJADO' : setorIni);
-  saveData();
-  closeModal('modal-nova-ordem');
-  showToast(`✓ Ordem ${newId} criada com sucesso!`, 'success');
-  renderPage('todas-ordens');
-  navTo('todas-ordens');
-}
-
-// ═══════════════════════════════════════════════════
 //  RESET
 // ═══════════════════════════════════════════════════
 function resetDados() {
-  if (!confirm('⚠ Tem certeza que deseja RESETAR todos os dados? Esta ação não pode ser desfeita!')) return;
+  if (!confirm('⚠ Tem certeza que deseja RESETAR todos os dados? Esta ação não pode ser desfeita!')) { navTo('dashboard'); return; }
+  localStorage.removeItem('mes_cargas');
   localStorage.removeItem('mes_ordens');
   localStorage.removeItem('mes_log');
   initData();
@@ -1740,9 +2640,9 @@ function resetDados() {
 //  EXPORT
 // ═══════════════════════════════════════════════════
 function exportLog() {
-  let csv = 'Data/Hora,Ordem,Produto,Cor,De,Para,Usuário\n';
+  let csv = 'Data/Hora,Ordem,Carga,Produto,De,Para,Ação,Usuário\n';
   state.log.slice().reverse().forEach(l => {
-    csv += `"${formatTs(l.ts)}","${l.orderId}","${l.produto}","${l.cor||''}","${l.de||''}","${l.para}","${l.usuario}"\n`;
+    csv += `"${formatTs(l.ts)}","${l.orderId||''}","${l.cargaId||''}","${(l.produto||'').replace(/"/g,'""')}","${l.de||''}","${l.para||''}","${(l.acao||'').replace(/"/g,'""')}","${l.usuario}"\n`;
   });
   const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
   const url = URL.createObjectURL(blob);
@@ -1753,12 +2653,16 @@ function exportLog() {
 // ═══════════════════════════════════════════════════
 //  HELPERS
 // ═══════════════════════════════════════════════════
-function addLog(orderId, produto, cor, de, para) {
+function addLog(orderId, cargaId, produto, de, cor, para, acao) {
   state.log.push({
     id: state.log.length + 1,
     ts: new Date().toISOString(),
-    orderId, produto, cor: cor||null,
-    de: de||null, para,
+    orderId: orderId || null,
+    cargaId: cargaId || null,
+    produto: produto || null,
+    de: de || null,
+    para: para || null,
+    acao: acao || null,
     usuario: state.usuario ? state.usuario.email : 'sistema'
   });
   saveLog();
@@ -1768,7 +2672,6 @@ function formatDate(d) {
   if (!d) return '—';
   try { return new Date(d).toLocaleDateString('pt-BR'); } catch(e) { return d; }
 }
-
 function formatTs(ts) {
   if (!ts) return '—';
   try {
@@ -1776,11 +2679,9 @@ function formatTs(ts) {
     return d.toLocaleDateString('pt-BR') + ' ' + d.toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'});
   } catch(e) { return ts; }
 }
-
 function closeModal(id) {
   document.getElementById(id).classList.remove('open');
 }
-
 function showToast(msg, type='info') {
   const toast = document.getElementById('toast');
   toast.textContent = msg;
@@ -1792,6 +2693,37 @@ function showToast(msg, type='info') {
 document.querySelectorAll('.modal-overlay').forEach(el => {
   el.addEventListener('click', e => { if(e.target === el) el.classList.remove('open'); });
 });
+
+// ═══════════════════════════════════════════════════
+//  MOBILE NAV (drawer) + PWA
+// ═══════════════════════════════════════════════════
+function toggleMobileSidebar() {
+  const sb = document.getElementById('sidebar');
+  const ov = document.getElementById('mobile-overlay');
+  if (!sb || !ov) return;
+  const open = sb.classList.toggle('mobile-open');
+  ov.classList.toggle('show', open);
+}
+function closeMobileSidebar() {
+  const sb = document.getElementById('sidebar');
+  const ov = document.getElementById('mobile-overlay');
+  if (sb) sb.classList.remove('mobile-open');
+  if (ov) ov.classList.remove('show');
+}
+
+// Fecha drawer ao redimensionar para desktop
+window.addEventListener('resize', () => {
+  if (window.innerWidth > 768) closeMobileSidebar();
+});
+
+// Service Worker registration (PWA / offline)
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(err => {
+      console.warn('SW registration failed (ok in file://)', err);
+    });
+  });
+}
 
 // ═══════════════════════════════════════════════════
 //  INIT
